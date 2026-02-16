@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Progress } from "@/components/ui/progress";
 import { IconDownload } from "@tabler/icons-react";
-import { RATE_LIMIT } from "@/convex/constants";
+import { RATE_LIMIT } from "@/lib/constants";
 
 export function DownloadRateLimit() {
   const rateLimit = useQuery(api.downloads.checkRateLimit);
@@ -32,7 +32,7 @@ export function DownloadRateLimit() {
       <Progress value={percentage} className="h-2" />
 
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{stats.todayCount} aujourd1apos;hui</span>
+        <span>{stats.todayCount} aujourd&apos;hui</span>
         <span>{stats.thisMonth} ce mois</span>
         <span>{stats.total} au total</span>
       </div>
