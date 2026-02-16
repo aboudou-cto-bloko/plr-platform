@@ -148,13 +148,38 @@ function getPaymentMessage(
   return messages[status][type];
 }
 
+// Mapper les statuts Moneroo vers nos statuts internes
+function normalizePaymentStatus(monerooStatus: string | null): PaymentStatus {
+  if (!monerooStatus) return "success";
+
+  const statusMap: Record<string, PaymentStatus> = {
+    success: "success",
+    successful: "success",
+    completed: "success",
+    paid: "success",
+    pending: "pending",
+    processing: "pending",
+    initiated: "pending",
+    failed: "failed",
+    error: "failed",
+    cancelled: "cancelled",
+    canceled: "cancelled",
+  };
+
+  return statusMap[monerooStatus.toLowerCase()] || "failed";
+}
+
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const status = (searchParams.get("status") as PaymentStatus) || "success";
+  // Paramètres Moneroo réels
+  const paymentStatus = searchParams.get("paymentStatus");
+  const paymentId = searchParams.get("paymentId");
   const type = (searchParams.get("type") as PaymentType) || "initial";
-  const transactionId = searchParams.get("transactionId");
+
+  // Normaliser le statut
+  const status = normalizePaymentStatus(paymentStatus);
 
   const [countdown, setCountdown] = useState(5);
   const message = getPaymentMessage(status, type);
@@ -195,9 +220,9 @@ function PaymentSuccessContent() {
               <p className="text-sm text-muted-foreground">{message.details}</p>
             </div>
 
-            {transactionId && (
+            {paymentId && (
               <p className="text-xs text-muted-foreground">
-                Référence : <span className="font-mono">{transactionId}</span>
+                Référence : <span className="font-mono">{paymentId}</span>
               </p>
             )}
           </CardContent>
