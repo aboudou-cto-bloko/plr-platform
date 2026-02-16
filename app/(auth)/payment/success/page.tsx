@@ -11,10 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconLoader } from "@tabler/icons-react";
+import { Suspense } from "react";
 import Link from "next/link";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRenewal = searchParams.get("type") === "renewal";
@@ -67,5 +68,21 @@ export default function PaymentSuccessPage() {
         </Card>
       </div>
     </section>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <IconLoader className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
