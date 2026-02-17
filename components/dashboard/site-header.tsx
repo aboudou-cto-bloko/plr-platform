@@ -1,9 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import Link from "next/link";
 
 export function SiteHeader() {
   return (
@@ -14,11 +12,6 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/library">Explorer</Link>
-          </Button>
-        </div>
       </div>
     </header>
   );
