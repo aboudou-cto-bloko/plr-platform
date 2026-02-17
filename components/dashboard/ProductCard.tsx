@@ -20,6 +20,7 @@ interface ProductCardProps {
   thumbnailUrl?: string | null;
   isNew?: boolean;
   downloadCount?: number;
+  onDownload?: () => void;
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
@@ -56,10 +57,19 @@ export function ProductCard({
   thumbnailUrl,
   isNew,
   downloadCount,
+  onDownload,
 }: ProductCardProps) {
   const categoryConfig = CATEGORY_CONFIG[category] || {
     label: category,
     color: "bg-muted text-muted-foreground",
+  };
+
+  const handleQuickAction = (e: React.MouseEvent) => {
+    if (onDownload) {
+      e.preventDefault();
+      e.stopPropagation();
+      onDownload();
+    }
   };
 
   return (
@@ -103,12 +113,16 @@ export function ProductCard({
           </Badge>
 
           {/* Quick action on hover */}
-          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg">
+          <button
+            type="button"
+            onClick={handleQuickAction}
+            className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+          >
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg hover:bg-primary/90 transition-colors">
               <span>Voir</span>
               <IconArrowRight className="size-4" />
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Content */}
