@@ -1,10 +1,15 @@
 "use client";
 
 import { Id } from "@/convex/_generated/dataModel";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconDownload, IconSparkles } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconSparkles,
+  IconFileText,
+  IconArrowRight,
+} from "@tabler/icons-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type Product = {
   _id: Id<"products">;
@@ -13,95 +18,181 @@ type Product = {
   description?: string;
   thumbnailUrl: string | null;
   isNouveau: boolean;
+  downloadCount?: number;
 };
 
-const categoryLabels: Record<string, string> = {
-  ebook: "Ebook",
-  template: "Template",
-  formation: "Formation",
-  kit: "Kit",
-  script: "Script",
+const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
+  ebook: {
+    label: "Ebook",
+    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  },
+  template: {
+    label: "Template",
+    color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+  },
+  formation: {
+    label: "Formation",
+    color: "bg-green-500/10 text-green-600 dark:text-green-400",
+  },
+  kit: {
+    label: "Kit",
+    color: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  },
+  script: {
+    label: "Script",
+    color: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+  },
 };
 
-const categoryColors: Record<string, string> = {
-  ebook: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  template: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-  formation: "bg-green-500/10 text-green-600 dark:text-green-400",
-  kit: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  script: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
-};
+interface ProductsGridProps {
+  products: Product[];
+  onProductClick: (id: Id<"products">) => void;
+  columns?: 3 | 4;
+  showDescription?: boolean;
+}
 
 export function ProductsGrid({
   products,
   onProductClick,
   columns = 4,
-}: {
-  products: Product[];
-  onProductClick: (id: Id<"products">) => void;
-  columns?: 3 | 4;
-}) {
+  showDescription = true,
+}: ProductsGridProps) {
   const gridCols =
     columns === 3
       ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
       : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
+  if (products.length === 0) {
+    return <EmptyState />;
+  }
+
   return (
-    <div className={`grid gap-4 ${gridCols}`}>
-      {products.map((product) => (
-        <Card
+    <div className={cn("grid gap-5", gridCols)}>
+      {products.map((product, index) => (
+        <ProductGridCard
           key={product._id}
-          className="group cursor-pointer overflow-hidden transition-all hover:shadow-md hover:border-primary/20"
+          product={product}
           onClick={() => onProductClick(product._id)}
-        >
-          <CardContent className="p-0">
-            <div className="relative aspect-4/3 bg-muted overflow-hidden">
-              {product.thumbnailUrl ? (
-                <Image
-                  src={product.thumbnailUrl}
-                  alt={product.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-linear-to-br from-muted to-muted/50">
-                  <IconDownload className="size-10 text-muted-foreground/50" />
-                </div>
-              )}
-
-              {/* Badges overlay */}
-              <div className="absolute left-2 top-2 flex flex-col gap-1">
-                {product.isNouveau && (
-                  <Badge className="gap-1 bg-primary shadow-sm">
-                    <IconSparkles className="size-3" />
-                    Nouveau
-                  </Badge>
-                )}
-              </div>
-
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-            </div>
-          </CardContent>
-
-          <CardFooter className="flex flex-col items-start gap-2 p-4">
-            <h4 className="line-clamp-2 font-medium leading-tight group-hover:text-primary transition-colors">
-              {product.title}
-            </h4>
-
-            {product.description && (
-              <p className="line-clamp-2 text-xs text-muted-foreground">
-                {product.description}
-              </p>
-            )}
-
-            <Badge
-              variant="secondary"
-              className={`text-xs ${categoryColors[product.category] || ""}`}
-            >
-              {categoryLabels[product.category] || product.category}
-            </Badge>
-          </CardFooter>
-        </Card>
+          showDescription={showDescription}
+          index={index}
+        />
       ))}
+    </div>
+  );
+}
+
+interface ProductGridCardProps {
+  product: Product;
+  onClick: () => void;
+  showDescription: boolean;
+  index: number;
+}
+
+function ProductGridCard({
+  product,
+  onClick,
+  showDescription,
+  index,
+}: ProductGridCardProps) {
+  const categoryConfig = CATEGORY_CONFIG[product.category] || {
+    label: product.category,
+    color: "bg-muted text-muted-foreground",
+  };
+
+  return (
+    <article
+      className={cn(
+        "product-card card-gradient group cursor-pointer rounded-xl border border-border overflow-hidden",
+        "animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both",
+      )}
+      style={{ animationDelay: `${index * 50}ms` }}
+      onClick={onClick}
+    >
+      {/* Thumbnail */}
+      <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+        {product.thumbnailUrl ? (
+          <Image
+            src={product.thumbnailUrl}
+            alt={product.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <IconFileText className="size-12 text-muted-foreground/30" />
+          </div>
+        )}
+
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {product.isNouveau && (
+            <Badge className="badge-new gap-1 shadow-lg">
+              <IconSparkles className="size-3" />
+              Nouveau
+            </Badge>
+          )}
+        </div>
+
+        {/* Quick view button on hover */}
+        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <div className="flex items-center justify-center gap-2 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow-lg">
+            <span>Voir le produit</span>
+            <IconArrowRight className="size-4" />
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-4 space-y-3">
+        {/* Title */}
+        <h4 className="font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          {product.title}
+        </h4>
+
+        {/* Description */}
+        {showDescription && product.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {product.description}
+          </p>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2">
+          <Badge
+            variant="secondary"
+            className={cn("text-xs font-medium", categoryConfig.color)}
+          >
+            {categoryConfig.label}
+          </Badge>
+
+          {product.downloadCount !== undefined && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <IconDownload className="size-3.5" />
+              <span>{product.downloadCount}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="empty-state flex flex-col items-center justify-center py-16 px-4 rounded-xl border border-dashed border-border">
+      <div className="size-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        <IconFileText className="size-8 text-muted-foreground" />
+      </div>
+      <h3 className="text-lg font-semibold text-foreground mb-1">
+        Aucun produit trouvé
+      </h3>
+      <p className="text-sm text-muted-foreground text-center max-w-sm">
+        Essayez de modifier vos filtres ou revenez plus tard pour découvrir de
+        nouveaux produits.
+      </p>
     </div>
   );
 }

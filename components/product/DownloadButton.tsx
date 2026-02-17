@@ -10,10 +10,13 @@ import {
   IconDownload,
   IconLock,
   IconCrown,
-  IconRefresh,
+  IconClock,
+  IconCheck,
+  IconLoader2,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface DownloadButtonProps {
   productId: Id<"products">;
@@ -34,10 +37,14 @@ export function DownloadButton({
 }: DownloadButtonProps) {
   const user = useQuery(api.users.getCurrentUser);
   const rateLimit = useQuery(api.downloads.checkRateLimit);
+  const hasDownloaded = useQuery(api.downloads.hasUserDownloaded, {
+    productId,
+  });
   const getDownloadUrl = useMutation(api.downloads.getDownloadUrl);
   const { deviceInfo } = useDeviceInfo();
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadComplete, setDownloadComplete] = useState(false);
 
   // États d'accès
   const isLoading = user === undefined;
@@ -51,6 +58,7 @@ export function DownloadButton({
     if (!isActive || isLocked || isRateLimited) return;
 
     setIsDownloading(true);
+    setDownloadComplete(false);
 
     try {
       const result = await getDownloadUrl({
@@ -60,7 +68,6 @@ export function DownloadButton({
       });
 
       if (result.url) {
-        // Créer un lien temporaire pour déclencher le téléchargement
         const link = document.createElement("a");
         link.href = result.url;
         link.download = result.fileName || `${productTitle}.zip`;
@@ -70,7 +77,11 @@ export function DownloadButton({
         link.click();
         document.body.removeChild(link);
 
+        setDownloadComplete(true);
         toast.success(`Téléchargement de "${productTitle}" démarré`);
+
+        // Reset après 3 secondes
+        setTimeout(() => setDownloadComplete(false), 3000);
       }
     } catch (error) {
       const message =
@@ -83,11 +94,17 @@ export function DownloadButton({
     }
   };
 
-  // Loading
+  // Loading state
   if (isLoading) {
     return (
-      <Button variant={variant} size={size} className={className} disabled>
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      <Button
+        variant={variant}
+        size={size}
+        className={cn("relative", className)}
+        disabled
+      >
+        <IconLoader2 className="size-4 animate-spin" />
+        <span className="ml-2">Chargement...</span>
       </Button>
     );
   }
@@ -98,73 +115,132 @@ export function DownloadButton({
       <Button
         variant="destructive"
         size={size}
-        className={className}
+        className={cn("relative group", className)}
         disabled
-        title="Votre compte est temporairement suspendu"
       >
-        {showIcon && <IconLock className="mr-2 h-4 w-4" />}
-        Compte suspendu
+        {showIcon && <IconLock className="size-4 mr-2" />}
+        <span>Compte suspendu</span>
+        <span className="absolute inset-x-0 -bottom-6 text-xs text-destructive/70 opacity-0 group-hover:opacity-100 transition-opacity">
+          Contactez le support
+        </span>
       </Button>
     );
   }
 
+  // Rate limited
   if (isRateLimited && rateLimit) {
     const resetIn = Math.ceil((rateLimit.resetAt - Date.now()) / 1000 / 60);
     return (
       <Button
         variant="outline"
         size={size}
-        className={className}
+        className={cn(
+          "relative border-amber-500/50 text-amber-600 dark:text-amber-400",
+          className,
+        )}
         disabled
-        title={`Limite atteinte. Réessayez dans ${resetIn} minutes`}
       >
-        {showIcon && <IconRefresh className="mr-2 h-4 w-4" />}
-        Limite atteinte ({resetIn}min)
+        {showIcon && <IconClock className="size-4 mr-2" />}
+        <span>Limite atteinte</span>
+        <span className="ml-1.5 px-1.5 py-0.5 rounded bg-amber-500/10 text-xs font-medium">
+          {resetIn}min
+        </span>
       </Button>
     );
   }
 
+  // Expired subscription
   if (isExpired) {
     return (
-      <Button variant="outline" size={size} className={className} asChild>
+      <Button
+        variant="outline"
+        size={size}
+        className={cn(
+          "relative border-primary/50 hover:border-primary hover:bg-primary/5",
+          className,
+        )}
+        asChild
+      >
         <Link href="/settings/billing">
-          {showIcon && <IconCrown className="mr-2 h-4 w-4" />}
-          Renouveler pour télécharger
+          {showIcon && <IconCrown className="size-4 mr-2 text-primary" />}
+          <span>Renouveler l&apos;abonnement</span>
         </Link>
       </Button>
     );
   }
 
+  // Free user - needs subscription
   if (isFree || !isActive) {
     return (
-      <Button variant={variant} size={size} className={className} asChild>
+      <Button
+        size={size}
+        className={cn(
+          "relative bg-gradient-to-r from-primary to-[oklch(0.65_0.18_180)] hover:opacity-90 transition-opacity",
+          className,
+        )}
+        asChild
+      >
         <Link href="/payment">
-          {showIcon && <IconCrown className="mr-2 h-4 w-4" />}
-          S&apos;abonner pour télécharger
+          {showIcon && <IconCrown className="size-4 mr-2" />}
+          <span>S&apos;abonner pour télécharger</span>
         </Link>
       </Button>
     );
   }
 
+  // Download complete state
+  if (downloadComplete) {
+    return (
+      <Button
+        variant="outline"
+        size={size}
+        className={cn(
+          "relative border-green-500/50 text-green-600 dark:text-green-400 bg-green-500/5",
+          className,
+        )}
+        disabled
+      >
+        <IconCheck className="size-4 mr-2" />
+        <span>Téléchargement lancé !</span>
+      </Button>
+    );
+  }
+
+  // Downloading state
+  if (isDownloading) {
+    return (
+      <Button
+        variant={variant}
+        size={size}
+        className={cn("relative", className)}
+        disabled
+      >
+        <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+          <div className="download-btn-progress h-full bg-primary/20 animate-pulse" />
+        </div>
+        <IconLoader2 className="size-4 mr-2 animate-spin relative z-10" />
+        <span className="relative z-10">Préparation...</span>
+      </Button>
+    );
+  }
+
+  // Ready to download
   return (
     <Button
       variant={variant}
       size={size}
-      className={className}
+      className={cn("relative group overflow-hidden", "btn-glow", className)}
       onClick={handleDownload}
-      disabled={isDownloading}
     >
-      {isDownloading ? (
-        <>
-          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          Téléchargement...
-        </>
-      ) : (
-        <>
-          {showIcon && <IconDownload className="mr-2 h-4 w-4" />}
-          Télécharger
-        </>
+      {/* Hover effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+
+      {showIcon && (
+        <IconDownload className="size-4 mr-2 relative z-10 group-hover:animate-bounce" />
       )}
+      <span className="relative z-10">
+        {hasDownloaded ? "Télécharger à nouveau" : "Télécharger"}
+      </span>
     </Button>
   );
 }
