@@ -146,7 +146,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
                 productId={productId}
                 productTitle={product.title}
                 size="lg"
-                className="w-full"
+                className="w-full btn-glow"
               />
               <DownloadRateLimit />
             </CardContent>

@@ -34,7 +34,7 @@ export function ProductCard({
   onDownload,
 }: ProductCardProps) {
   return (
-    <Card className="group overflow-hidden hover:border-primary/50 transition-colors">
+    <Card className="group product-card card-gradient overflow-hidden hover:border-primary/50 transition-colors">
       {/* Clickable Thumbnail */}
       <Link href={`/product/${id}`} className="block">
         <div className="aspect-4/3 bg-muted relative">

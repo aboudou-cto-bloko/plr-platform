@@ -7,7 +7,6 @@ import {
   IconDownload,
   IconHelp,
   IconSettings,
-  IconSparkles,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,11 +34,6 @@ const navMain = [
     title: "Bibliothèque",
     url: "/library",
     icon: IconBook,
-  },
-  {
-    title: "Nouveautés",
-    url: "/library?filter=new",
-    icon: IconSparkles,
   },
   {
     title: "Téléchargements",
