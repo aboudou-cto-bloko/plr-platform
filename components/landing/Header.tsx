@@ -30,25 +30,24 @@ export function Header() {
         data-state={menuState && "active"}
         className={cn(
           "fixed top-0 left-0 z-20 w-full transition-all duration-300",
-          isScrolled &&
-            "bg-background/75 border-b border-black/5 backdrop-blur-lg",
+          isScrolled
+            ? "bg-black/80 border-b border-white/10 backdrop-blur-xl"
+            : "bg-transparent",
         )}
       >
         <div className="mx-auto max-w-5xl px-6">
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0">
             <div className="flex w-full justify-between gap-6 lg:w-auto">
-              {/* Logo */}
+              {/* Logo - always white */}
               <Link
                 href="/"
                 aria-label="PLR Library"
                 className="flex items-center space-x-2"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                  <span className="text-sm font-bold text-primary-foreground">
-                    PLR
-                  </span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white transition-transform duration-300 hover:scale-105">
+                  <span className="text-sm font-bold text-black">PLR</span>
                 </div>
-                <span className="text-lg font-semibold text-foreground">
+                <span className="text-lg font-semibold text-white">
                   Library
                 </span>
               </Link>
@@ -61,25 +60,30 @@ export function Header() {
               >
                 <Menu
                   className={cn(
-                    "m-auto size-6 duration-200",
+                    "m-auto size-6 text-white duration-200",
                     menuState && "rotate-180 scale-0 opacity-0",
                   )}
                 />
                 <X
                   className={cn(
-                    "absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200",
+                    "absolute inset-0 m-auto size-6 text-white -rotate-180 scale-0 opacity-0 duration-200",
                     menuState && "rotate-0 scale-100 opacity-100",
                   )}
                 />
               </button>
 
-              {/* Desktop menu */}
+              {/* Desktop menu - always white */}
               <div className="m-auto hidden size-fit lg:block">
                 <ul className="flex gap-1">
                   {menuItems.map((item, index) => (
                     <li key={index}>
-                      <Button asChild variant="ghost" size="sm">
-                        <Link href={item.href} className="text-base">
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="text-white/80 hover:text-white hover:bg-white/10"
+                      >
+                        <Link href={item.href}>
                           <span>{item.name}</span>
                         </Link>
                       </Button>
@@ -92,7 +96,9 @@ export function Header() {
             {/* Mobile menu + CTA buttons */}
             <div
               className={cn(
-                "bg-background mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent",
+                "mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none",
+                // Mobile menu styling - dark bg for consistency
+                "bg-black/95 border-white/10 shadow-black/50 backdrop-blur-xl",
                 menuState && "block lg:flex",
               )}
             >
@@ -104,7 +110,7 @@ export function Header() {
                       <Link
                         href={item.href}
                         onClick={() => setMenuState(false)}
-                        className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                        className="text-white/70 hover:text-white block duration-150"
                       >
                         <span>{item.name}</span>
                       </Link>
@@ -113,31 +119,30 @@ export function Header() {
                 </ul>
               </div>
 
-              {/* CTA buttons */}
+              {/* CTA buttons - always visible */}
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                {/* Connexion */}
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className={cn(isScrolled && "lg:hidden")}
+                  className="text-white/80 hover:text-white hover:bg-white/10"
                 >
                   <Link href="/login">
                     <span>Connexion</span>
                   </Link>
                 </Button>
+
+                {/* Primary CTA */}
                 <Button
                   asChild
                   size="sm"
-                  className={cn(isScrolled && "lg:hidden")}
-                >
-                  <Link href="/signup">
-                    <span>Commencer</span>
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="sm"
-                  className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
+                  className={cn(
+                    "transition-all duration-300",
+                    isScrolled
+                      ? "shadow-lg shadow-primary/30"
+                      : "shadow-lg shadow-primary/25",
+                  )}
                 >
                   <Link href="/signup">
                     <span>Commencer</span>

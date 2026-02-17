@@ -6,6 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 
 const faqItems = [
@@ -55,51 +57,60 @@ const faqItems = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="bg-muted/50 py-16 md:py-24">
-      <div className="mx-auto max-w-5xl px-4 md:px-6">
-        <div>
-          <h2 className="text-foreground text-3xl font-semibold sm:text-4xl">
+    <section id="faq" className="relative overflow-hidden bg-black py-24">
+      {/* Background effects */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+
+      <div className="relative z-10 mx-auto max-w-3xl px-6">
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-primary">
+            FAQ
+          </span>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Questions fréquentes
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-2xl text-balance text-lg">
-            Tout ce que vous devez savoir sur PLR Library et comment démarrer
-            votre business de produits digitaux.
+          <p className="mt-4 text-lg text-white/60">
+            Tout ce que vous devez savoir pour démarrer
           </p>
         </div>
 
-        <div className="mt-12">
-          <Accordion
-            type="single"
-            collapsible
-            className="bg-card ring-foreground/5 w-full rounded-xl border border-transparent px-6 py-3 shadow-sm ring-1 md:px-8"
-          >
-            {faqItems.map((item) => (
-              <AccordionItem
-                key={item.id}
-                value={item.id}
-                className="border-dashed"
-              >
-                <AccordionTrigger className="cursor-pointer text-left text-base hover:no-underline">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-muted-foreground text-base">
-                    {item.answer}
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-          <p className="text-muted-foreground mt-6 text-sm">
-            Vous avez une autre question ?{" "}
-            <Link
-              href="mailto:support@plr-library.com"
-              className="text-primary font-medium hover:underline"
+        {/* Accordion */}
+        <Accordion type="single" collapsible className="space-y-3">
+          {faqItems.map((item) => (
+            <AccordionItem
+              key={item.id}
+              value={item.id}
+              className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] px-6 backdrop-blur-sm transition-colors data-[state=open]:border-primary/30 data-[state=open]:bg-white/[0.05]"
             >
-              Contactez notre support
-            </Link>
+              <AccordionTrigger className="py-5 text-left text-base font-medium text-white hover:no-underline [&[data-state=open]>svg]:text-primary">
+                {item.question}
+              </AccordionTrigger>
+              <AccordionContent className="pb-5 text-white/60">
+                {item.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {/* Contact CTA */}
+        <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center backdrop-blur-sm">
+          <p className="text-lg font-medium text-white">
+            Vous avez une autre question ?
           </p>
+          <p className="mt-2 text-white/60">
+            Notre équipe vous répond en moins de 24h
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+          >
+            <Link href="mailto:support@plr-library.com">
+              <Mail className="mr-2 h-4 w-4" />
+              Contactez-nous
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

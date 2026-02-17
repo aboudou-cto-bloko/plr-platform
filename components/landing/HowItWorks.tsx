@@ -1,66 +1,89 @@
-import { ArrowRight } from "lucide-react";
+import { UserPlus, MousePointerClick, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+const steps = [
+  {
+    number: "01",
+    icon: UserPlus,
+    title: "Créez votre compte",
+    description: "Inscription en 30 secondes. Accès immédiat à la plateforme.",
+  },
+  {
+    number: "02",
+    icon: MousePointerClick,
+    title: "Choisissez vos produits",
+    description:
+      "Parcourez, filtrez, téléchargez. Tout est inclus dans l'abonnement.",
+  },
+  {
+    number: "03",
+    icon: Wallet,
+    title: "Encaissez vos ventes",
+    description:
+      "Personnalisez, vendez sur vos canaux, gardez 100% des profits.",
+  },
+];
 
 export function HowItWorks() {
   return (
-    <section>
-      <div className="py-24">
-        <div className="mx-auto w-full max-w-5xl px-6">
-          <div className="mx-auto max-w-2xl">
-            <div>
-              <h2 className="text-foreground text-3xl font-semibold sm:text-4xl">
-                Comment ça marche
-              </h2>
-              <p className="text-muted-foreground mb-12 mt-4 text-lg sm:text-xl">
-                Trois étapes simples pour commencer à vendre des produits
-                digitaux dès aujourd&apos;hui. Pas de compétence technique
-                requise.
-              </p>
-            </div>
+    <section className="relative overflow-hidden bg-black py-24">
+      {/* Background effects */}
 
-            <div className="my-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="space-y-2">
-                <span className="mb-4 block text-3xl">1️⃣</span>
-                <h3 className="text-xl font-medium">Abonnez-vous</h3>
-                <p className="text-muted-foreground">
-                  Créez votre compte et accédez immédiatement à toute la
-                  bibliothèque de produits PLR.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <span className="mb-4 block text-3xl">2️⃣</span>
-                <h3 className="text-xl font-medium">Téléchargez</h3>
-                <p className="text-muted-foreground">
-                  Parcourez la bibliothèque et téléchargez les produits qui
-                  correspondent à votre niche.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <span className="mb-4 block text-3xl">3️⃣</span>
-                <h3 className="text-xl font-medium">Revendez</h3>
-                <p className="text-muted-foreground">
-                  Personnalisez avec votre marque et vendez. Vous gardez 100%
-                  des profits.
-                </p>
-              </div>
-            </div>
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-6">
+        {/* Header */}
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-primary">
+            3 étapes
+          </span>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+            Lancez-vous en{" "}
+            <span className="text-gradient">moins de 5 minutes</span>
+          </h2>
+        </div>
 
-            <div className="border-t">
-              <ul role="list" className="text-muted-foreground mt-8 space-y-2">
-                {[
-                  { value: "30+", label: "Produits disponibles" },
-                  { value: "100%", label: "Des profits pour vous" },
-                ].map((stat, index) => (
-                  <li key={index} className="-ml-0.5 flex items-center gap-1.5">
-                    <ArrowRight className="size-4 opacity-50" />
-                    <span className="text-foreground font-medium">
-                      {stat.value}
-                    </span>{" "}
-                    {stat.label}
-                  </li>
-                ))}
-              </ul>
-            </div>
+        {/* Steps - horizontal on desktop */}
+        <div className="relative mt-16">
+          {/* Connection line - desktop */}
+          <div className="absolute left-[16.67%] right-[16.67%] top-12 hidden h-px bg-gradient-to-r from-primary/50 via-primary to-primary/50 lg:block" />
+
+          <div className="grid gap-8 lg:grid-cols-3">
+            {steps.map((step, index) => (
+              <div key={index} className="relative text-center">
+                {/* Step circle */}
+                <div className="relative mx-auto mb-6 flex h-24 w-24 items-center justify-center">
+                  {/* Outer ring */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-white/10" />
+
+                  {/* Inner circle */}
+                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-black ring-1 ring-primary/30">
+                    <step.icon className="h-7 w-7 text-primary" />
+                  </div>
+
+                  {/* Number badge */}
+                  <div className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {step.number}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <h3 className="mb-2 text-xl font-semibold text-white">
+                  {step.title}
+                </h3>
+                <p className="text-white/50">{step.description}</p>
+              </div>
+            ))}
           </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-16 text-center">
+          <Button asChild size="lg" className="shadow-lg shadow-primary/25">
+            <Link href="/signup">Commencer gratuitement</Link>
+          </Button>
+          <p className="mt-4 text-sm text-white/40">
+            Pas de carte requise • Annulez à tout moment
+          </p>
         </div>
       </div>
     </section>
