@@ -8,6 +8,7 @@ import {
 } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { SUBSCRIPTION, DEFAULT_PAYMENT_METHODS } from "./constants";
+import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 
 // Get user payments history
@@ -47,8 +48,13 @@ export const getPendingPayments = query({
 });
 
 export const initializePayment = action({
-  args: {},
-  handler: async (ctx): Promise<{ checkoutUrl: string; paymentId: string }> => {
+  args: {
+    affiliateCode: v.optional(v.string()),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ checkoutUrl: string; paymentId: string }> => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Non authentifié");
 
@@ -59,10 +65,43 @@ export const initializePayment = action({
       throw new Error("Vous avez déjà un abonnement actif");
     }
 
+    // Calculer le prix avec réduction affilié si applicable
+    let amount = Number(SUBSCRIPTION.PRICE);
+    let discountAmount = 0;
+    let affiliateId: string | undefined;
+    let affiliateCode: string | undefined;
+
+    if (args.affiliateCode) {
+      const priceInfo = await ctx.runQuery(
+        internal.affiliates.calculatePriceInternal,
+        {
+          code: args.affiliateCode,
+        },
+      );
+
+      if (priceInfo.affiliateCode) {
+        amount = priceInfo.finalPrice;
+        discountAmount = priceInfo.discountAmount;
+        affiliateId = priceInfo.affiliateId;
+        affiliateCode = priceInfo.affiliateCode;
+
+        // Lier l'utilisateur à l'affilié si pas déjà fait
+        if (!user.referredBy) {
+          await ctx.runMutation(internal.affiliates.linkUserToAffiliate, {
+            userId,
+            affiliateCode: affiliateCode,
+          });
+        }
+      }
+    }
+
     // Create payment record
     const paymentId = await ctx.runMutation(internal.payments.createPayment, {
       userId,
-      amount: SUBSCRIPTION.PRICE,
+      amount,
+      originalAmount: SUBSCRIPTION.PRICE,
+      discountAmount,
+      affiliateId,
       currency: SUBSCRIPTION.CURRENCY,
       type: "initial",
     });
@@ -78,19 +117,26 @@ export const initializePayment = action({
           Accept: "application/json",
         },
         body: JSON.stringify({
-          amount: SUBSCRIPTION.PRICE,
+          amount,
           currency: SUBSCRIPTION.CURRENCY,
-          description: SUBSCRIPTION.DESCRIPTION,
+          description:
+            discountAmount > 0
+              ? `${SUBSCRIPTION.DESCRIPTION} (réduction ${affiliateCode})`
+              : SUBSCRIPTION.DESCRIPTION,
           customer: {
             email: user.email,
             first_name: user.name?.split(" ")[0] || "Client",
             last_name: user.name?.split(" ").slice(1).join(" ") || "PLR",
           },
-          return_url: `${process.env.SITE_URL}/payment/success`,
+          return_url: `${process.env.SITE_URL}/payment/success?type=initial`,
           metadata: {
             user_id: userId,
             payment_id: paymentId,
             type: "initial",
+            affiliate_code: affiliateCode || null,
+            affiliate_id: affiliateId || null,
+            original_amount: SUBSCRIPTION.PRICE,
+            discount_amount: discountAmount,
           },
           methods: [...DEFAULT_PAYMENT_METHODS],
         }),
@@ -204,18 +250,26 @@ export const createPayment = internalMutation({
   args: {
     userId: v.id("users"),
     amount: v.number(),
+    originalAmount: v.optional(v.number()),
+    discountAmount: v.optional(v.number()),
+    affiliateId: v.optional(v.string()),
     currency: v.string(),
     type: v.union(v.literal("initial"), v.literal("renewal")),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("payments", {
+    const paymentId = await ctx.db.insert("payments", {
       userId: args.userId,
       amount: args.amount,
+      originalAmount: args.originalAmount,
+      discountAmount: args.discountAmount,
+      affiliateId: args.affiliateId as Id<"affiliates"> | undefined,
       currency: args.currency,
       type: args.type,
       status: "pending",
       createdAt: Date.now(),
     });
+
+    return paymentId;
   },
 });
 

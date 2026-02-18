@@ -21,6 +21,8 @@ export default defineSchema({
     isLocked: v.optional(v.boolean()),
     lockReason: v.optional(v.string()),
     lockedAt: v.optional(v.number()),
+    referredBy: v.optional(v.id("affiliates")),
+    referralCode: v.optional(v.string()),
   })
     .index("by_email", ["email"])
     .index("by_subscription", ["subscriptionStatus"]),
@@ -126,6 +128,9 @@ export default defineSchema({
     subscriptionId: v.optional(v.id("subscriptions")),
     monerooPaymentId: v.optional(v.string()),
     amount: v.number(),
+    originalAmount: v.optional(v.number()),
+    discountAmount: v.optional(v.number()),
+    affiliateId: v.optional(v.id("affiliates")),
     currency: v.string(),
     status: v.union(
       v.literal("initiated"),
@@ -150,4 +155,43 @@ export default defineSchema({
     completedAt: v.number(),
     updatedAt: v.optional(v.number()),
   }).index("by_user", ["userId"]),
+
+  affiliates: defineTable({
+    name: v.string(),
+    email: v.string(), // Email de l'affilié
+    code: v.string(), // Code unique: "john", "partner2024"
+    discountPercent: v.number(), // 0-100, réduction pour les users (ex: 20%)
+    commissionPercent: v.number(), // Commission pour l'affilié (ex: 30%)
+    isActive: v.boolean(),
+    totalReferrals: v.number(), // Nombre d'inscrits
+    totalPaidReferrals: v.number(), // Nombre de paiements
+    totalRevenue: v.number(), // Revenue généré (en FCFA)
+    totalCommission: v.number(), // Commission totale due
+    unpaidCommission: v.number(), // Commission non payée
+    createdAt: v.number(),
+  })
+    .index("by_code", ["code"])
+    .index("by_email", ["email"])
+    .index("by_active", ["isActive"]),
+
+  // Table des référrals (tracking)
+  referrals: defineTable({
+    affiliateId: v.id("affiliates"),
+    userId: v.optional(v.id("users")), // User qui s'est inscrit (optional car peut être juste un clic)
+    paymentId: v.optional(v.id("payments")), // Premier paiement
+    originalAmount: v.optional(v.number()), // Prix original
+    discountAmount: v.optional(v.number()), // Montant de réduction
+    finalAmount: v.optional(v.number()), // Prix payé
+    commissionAmount: v.optional(v.number()), // Commission due à l'affilié
+    status: v.union(
+      v.literal("clicked"), // A cliqué sur le lien
+      v.literal("signed_up"), // S'est inscrit
+      v.literal("paid"), // A payé (converti)
+    ),
+    createdAt: v.number(),
+    convertedAt: v.optional(v.number()), // Date de conversion (paiement)
+  })
+    .index("by_affiliate", ["affiliateId"])
+    .index("by_user", ["userId"])
+    .index("by_affiliate_status", ["affiliateId", "status"]),
 });

@@ -1,3 +1,5 @@
+// convex/http/monerooWebhook.ts - Ajouter le traitement des commissions affiliés
+
 import { httpAction } from "../_generated/server";
 import { internal } from "../_generated/api";
 
@@ -22,13 +24,11 @@ export const monerooWebhook = httpAction(async (ctx, request) => {
     false,
     ["sign"],
   );
-
   const signatureBuffer = await crypto.subtle.sign(
     "HMAC",
     key,
     encoder.encode(payload),
   );
-
   const computedSignature = Array.from(new Uint8Array(signatureBuffer))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
@@ -46,6 +46,9 @@ export const monerooWebhook = httpAction(async (ctx, request) => {
   console.log("Webhook received:", eventType, data.id);
 
   const isRenewal = data.metadata?.type === "renewal";
+  const affiliateId = data.metadata?.affiliate_id;
+  const originalAmount = data.metadata?.original_amount;
+  const discountAmount = data.metadata?.discount_amount;
 
   try {
     switch (eventType) {
@@ -55,9 +58,20 @@ export const monerooWebhook = httpAction(async (ctx, request) => {
             monerooPaymentId: data.id,
           });
         } else {
+          // Activer l'abonnement
           await ctx.runMutation(internal.subscriptions.activateSubscription, {
             monerooPaymentId: data.id,
           });
+
+          // Traiter la commission affilié si applicable
+          if (affiliateId && data.metadata?.user_id) {
+            await ctx.runMutation(internal.affiliates.convertReferral, {
+              userId: data.metadata.user_id,
+              paymentId: data.metadata.payment_id,
+              originalAmount: originalAmount || data.amount,
+              finalAmount: data.amount,
+            });
+          }
         }
         break;
 

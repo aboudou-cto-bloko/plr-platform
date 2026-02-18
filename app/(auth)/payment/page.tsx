@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useQuery, useAction } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,14 +15,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   IconCheck,
   IconCreditCard,
   IconLoader2,
   IconShieldCheck,
+  IconGift,
+  IconX,
+  IconTag,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { formatPrice, SUBSCRIPTION } from "@/lib/constants";
 
 const PLAN_FEATURES = [
   "Accès à tous les produits PLR",
@@ -31,13 +36,52 @@ const PLAN_FEATURES = [
   "Support par email",
 ];
 
-export default function PaymentPage() {
+const STORAGE_KEY = "plr_affiliate_code";
+
+// Helper pour récupérer le code initial (côté client uniquement)
+function getInitialCode(searchParams: URLSearchParams): string | null {
+  if (typeof window === "undefined") return null;
+
+  const urlCode = searchParams.get("ref");
+  if (urlCode) {
+    const code = urlCode.toLowerCase().trim();
+    localStorage.setItem(STORAGE_KEY, code);
+    return code;
+  }
+
+  return localStorage.getItem(STORAGE_KEY);
+}
+
+function PaymentContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useQuery(api.users.getCurrentUser);
   const initPayment = useAction(api.payments.initializePayment);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isApplyingCode, setIsApplyingCode] = useState(false);
+
+  // Initialiser le code une seule fois avec useMemo
+  const initialCode = useMemo(
+    () => getInitialCode(searchParams),
+    [searchParams],
+  );
+
+  // State pour le code affilié
+  const [promoCode, setPromoCode] = useState(initialCode || "");
+  const [appliedCode, setAppliedCode] = useState<string | null>(initialCode);
+
+  // Vérifier le code affilié et calculer le prix
+  const priceInfo = useQuery(
+    api.affiliates.calculatePrice,
+    appliedCode ? { code: appliedCode } : { code: undefined },
+  );
+
+  // Vérifier si le code appliqué est valide
+  const isValidCode =
+    priceInfo?.affiliateCode === appliedCode && appliedCode !== null;
+  const hasDiscount = priceInfo && priceInfo.discountPercent > 0 && isValidCode;
 
   // Redirect if already subscribed
   useEffect(() => {
@@ -46,21 +90,47 @@ export default function PaymentPage() {
     }
   }, [user, router]);
 
+  const handleApplyCode = () => {
+    if (!promoCode.trim()) return;
+
+    setIsApplyingCode(true);
+    const code = promoCode.toLowerCase().trim();
+
+    // Sauvegarder et appliquer
+    localStorage.setItem(STORAGE_KEY, code);
+    setAppliedCode(code);
+
+    // Le résultat sera mis à jour automatiquement via la query
+    setTimeout(() => setIsApplyingCode(false), 300);
+  };
+
+  const handleRemoveCode = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setAppliedCode(null);
+    setPromoCode("");
+  };
+
   const handlePayment = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await initPayment({});
+      const result = await initPayment({
+        affiliateCode: isValidCode ? appliedCode : undefined,
+      });
       // Redirect to Moneroo checkout
       window.location.href = result.checkoutUrl;
-    } catch (error) {
-      setError("Erreur lors de l'initialisation du paiement");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de l'initialisation du paiement",
+      );
       setIsLoading(false);
     }
   };
 
-  if (user === undefined) {
+  if (user === undefined || priceInfo === undefined) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <IconLoader2 className="size-8 animate-spin text-primary" />
@@ -73,8 +143,13 @@ export default function PaymentPage() {
     return null;
   }
 
+  const finalPrice = priceInfo?.finalPrice ?? SUBSCRIPTION.PRICE;
+  const originalPrice = priceInfo?.originalPrice ?? SUBSCRIPTION.PRICE;
+  const discountAmount = priceInfo?.discountAmount ?? 0;
+  const discountPercent = priceInfo?.discountPercent ?? 0;
+
   return (
-    <section className="flex min-h-screen bg-linear-to-b from-muted to-background px-4 py-16">
+    <section className="flex min-h-screen bg-gradient-to-b from-muted to-background px-4 py-16">
       <div className="m-auto w-full max-w-lg">
         {/* Logo */}
         <div className="mb-8 text-center">
@@ -100,21 +175,97 @@ export default function PaymentPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {/* Code promo / Affiliation */}
+            <div className="space-y-3">
+              <Label>Code promo / Parrainage</Label>
+              {appliedCode && isValidCode ? (
+                <div className="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-500/10 p-3">
+                  <div className="flex items-center gap-2">
+                    <IconGift className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="font-medium text-green-700 dark:text-green-400">
+                        Code &quot;{appliedCode}&quot; appliqué
+                      </p>
+                      <p className="text-sm text-green-600 dark:text-green-500">
+                        -{discountPercent}% de réduction
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveCode}
+                    className="text-green-700 hover:text-green-800 hover:bg-green-500/20"
+                  >
+                    <IconX className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Entrez votre code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleApplyCode}
+                    disabled={!promoCode.trim() || isApplyingCode}
+                  >
+                    {isApplyingCode ? (
+                      <IconLoader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Appliquer"
+                    )}
+                  </Button>
+                </div>
+              )}
+              {appliedCode && !isValidCode && priceInfo && (
+                <p className="text-sm text-destructive">
+                  Code invalide ou expiré
+                </p>
+              )}
+            </div>
+
             {/* Price */}
-            <div className="text-center rounded-lg bg-primary/5 p-6">
-              <p className="text-sm text-muted-foreground">
+            <div className="rounded-lg bg-primary/5 p-6 space-y-3">
+              <p className="text-sm text-muted-foreground text-center">
                 Abonnement mensuel
               </p>
-              <div className="mt-2">
-                <span className="text-4xl font-bold">15,000</span>
-                <span className="text-lg text-muted-foreground">
-                  {" "}
-                  FCFA/mois
-                </span>
-              </div>
-              <Badge variant="secondary" className="mt-2">
-                Annulez à tout moment
-              </Badge>
+
+              {hasDiscount ? (
+                <>
+                  <div className="text-center">
+                    <span className="text-2xl text-muted-foreground line-through">
+                      {formatPrice(originalPrice)}
+                    </span>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-4xl font-bold text-green-600">
+                      {formatPrice(finalPrice)}
+                    </span>
+                    <span className="text-lg text-muted-foreground">
+                      {" "}
+                      /mois
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-center gap-1 text-sm text-green-600">
+                    <IconTag className="h-4 w-4" />
+                    <span>
+                      Vous économisez {formatPrice(discountAmount)} (-
+                      {discountPercent}%)
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <span className="text-4xl font-bold">
+                    {formatPrice(finalPrice)}
+                  </span>
+                  <span className="text-lg text-muted-foreground"> /mois</span>
+                </div>
+              )}
             </div>
 
             {/* Features */}
@@ -149,7 +300,7 @@ export default function PaymentPage() {
               ) : (
                 <IconCreditCard className="mr-2 size-4" />
               )}
-              Payer 15,000 FCFA
+              Payer {formatPrice(finalPrice)}
             </Button>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -172,5 +323,19 @@ export default function PaymentPage() {
         </p>
       </div>
     </section>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <IconLoader2 className="size-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <PaymentContent />
+    </Suspense>
   );
 }
