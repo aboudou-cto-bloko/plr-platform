@@ -10,6 +10,7 @@ import {
   IconUpload,
   IconAlertTriangle,
   IconHistory,
+  IconUserPlus,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 
@@ -58,6 +59,7 @@ const navMain = [
     url: "/admin/logs",
     icon: IconHistory,
   },
+  { url: "/admin/affiliates", title: "Affiliés", icon: IconUserPlus },
 ];
 
 const navSecondary = [
