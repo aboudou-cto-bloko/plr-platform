@@ -10,6 +10,7 @@ import {
   Users,
   CreditCard,
   ArrowLeft,
+  UserPlus,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/admin/upload", label: "Upload", icon: Upload },
   { href: "/admin/library", label: "Bibliothèque", icon: Library },
   { href: "/admin/users", label: "Utilisateurs", icon: Users },
+  { href: "/admin/affiliates", label: "Affiliés", icon: UserPlus },
   { href: "/admin/subscriptions", label: "Abonnements", icon: CreditCard },
 ];
 
