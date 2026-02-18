@@ -405,6 +405,7 @@ export default function AffiliateDetailPage() {
                   <TableRow>
                     <TableHead>Utilisateur</TableHead>
                     <TableHead>Statut</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Montant</TableHead>
                     <TableHead>Commission</TableHead>
                     <TableHead>Date</TableHead>
@@ -428,6 +429,7 @@ export default function AffiliateDetailPage() {
                           </div>
                         </div>
                       </TableCell>
+
                       <TableCell>
                         <Badge
                           variant={
@@ -449,6 +451,15 @@ export default function AffiliateDetailPage() {
                             : referral.status === "signed_up"
                               ? "Inscrit"
                               : "Clic"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={referral.isRenewal ? "outline" : "default"}
+                        >
+                          {referral.isRenewal
+                            ? "Renouvellement"
+                            : "1er paiement"}
                         </Badge>
                       </TableCell>
                       <TableCell>

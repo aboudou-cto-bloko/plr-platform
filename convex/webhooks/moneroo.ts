@@ -46,24 +46,36 @@ export const monerooWebhook = httpAction(async (ctx, request) => {
   console.log("Webhook received:", eventType, data.id);
 
   const isRenewal = data.metadata?.type === "renewal";
-  const affiliateId = data.metadata?.affiliate_id;
-  const originalAmount = data.metadata?.original_amount;
-  const discountAmount = data.metadata?.discount_amount;
 
   try {
     switch (eventType) {
       case "payment.success":
         if (isRenewal) {
+          // Étendre l'abonnement
           await ctx.runMutation(internal.renewal.extendSubscription, {
             monerooPaymentId: data.id,
           });
+
+          if (data.metadata?.user_id) {
+            await ctx.runMutation(
+              internal.affiliates.processRenewalCommission,
+              {
+                userId: data.metadata.user_id,
+                paymentId: data.metadata.payment_id,
+                amount: data.amount,
+              },
+            );
+          }
         } else {
-          // Activer l'abonnement
+          // Premier paiement: activer l'abonnement
           await ctx.runMutation(internal.subscriptions.activateSubscription, {
             monerooPaymentId: data.id,
           });
 
-          // Traiter la commission affilié si applicable
+          // Traiter la commission affilié (premier paiement)
+          const affiliateId = data.metadata?.affiliate_id;
+          const originalAmount = data.metadata?.original_amount;
+
           if (affiliateId && data.metadata?.user_id) {
             await ctx.runMutation(internal.affiliates.convertReferral, {
               userId: data.metadata.user_id,
@@ -79,7 +91,6 @@ export const monerooWebhook = httpAction(async (ctx, request) => {
       case "payment.cancelled":
         if (isRenewal) {
           console.log(`Renewal payment failed/cancelled: ${data.id}`);
-          // La subscription reste en pending_renewal
         } else {
           await ctx.runMutation(internal.subscriptions.failPayment, {
             monerooPaymentId: data.id,

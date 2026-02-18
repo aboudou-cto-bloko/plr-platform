@@ -183,6 +183,7 @@ export default defineSchema({
     discountAmount: v.optional(v.number()), // Montant de réduction
     finalAmount: v.optional(v.number()), // Prix payé
     commissionAmount: v.optional(v.number()), // Commission due à l'affilié
+    isRenewal: v.optional(v.boolean()), // Indique si c'est un renouvellement
     status: v.union(
       v.literal("clicked"), // A cliqué sur le lien
       v.literal("signed_up"), // S'est inscrit

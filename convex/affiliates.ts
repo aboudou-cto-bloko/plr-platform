@@ -500,3 +500,58 @@ export const linkUserToAffiliate = internalMutation({
     });
   },
 });
+
+// Traiter la commission sur un renouvellement
+export const processRenewalCommission = internalMutation({
+  args: {
+    userId: v.id("users"),
+    paymentId: v.id("payments"),
+    amount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Récupérer l'utilisateur
+    const user = await ctx.db.get(args.userId);
+    if (!user || !user.referredBy) {
+      // Pas référé par un affilié → pas de commission
+      return;
+    }
+
+    // Récupérer l'affilié
+    const affiliate = await ctx.db.get(user.referredBy);
+    if (!affiliate || !affiliate.isActive) {
+      // Affilié inexistant ou désactivé → pas de commission
+      return;
+    }
+
+    // Calculer la commission (sur le prix normal, pas de réduction)
+    const commissionAmount = Math.round(
+      args.amount * (affiliate.commissionPercent / 100),
+    );
+
+    // Créer un nouveau referral pour ce renouvellement
+    await ctx.db.insert("referrals", {
+      affiliateId: affiliate._id,
+      userId: args.userId,
+      paymentId: args.paymentId,
+      originalAmount: args.amount,
+      discountAmount: 0, // Pas de réduction sur les renouvellements
+      finalAmount: args.amount,
+      commissionAmount,
+      status: "paid",
+      isRenewal: true,
+      createdAt: Date.now(),
+      convertedAt: Date.now(),
+    });
+
+    // Mettre à jour les stats de l'affilié
+    await ctx.db.patch(affiliate._id, {
+      totalRevenue: affiliate.totalRevenue + args.amount,
+      totalCommission: affiliate.totalCommission + commissionAmount,
+      unpaidCommission: affiliate.unpaidCommission + commissionAmount,
+    });
+
+    console.log(
+      `Affiliate ${affiliate.code}: +${commissionAmount} FCFA commission (renewal)`,
+    );
+  },
+});
