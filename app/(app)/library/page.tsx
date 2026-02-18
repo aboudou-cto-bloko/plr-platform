@@ -23,6 +23,7 @@ import {
   IconSparkles,
   IconX,
 } from "@tabler/icons-react";
+import { PRODUCT_NICHES, type ProductNiche } from "@/lib/constants";
 import { Id } from "@/convex/_generated/dataModel";
 
 type CategoryType = "ebook" | "template" | "formation" | "kit" | "script";
@@ -49,14 +50,18 @@ export default function LibraryPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     CategoryType | "all"
   >(categoryParam || "all");
+
+  const [selectedNiche, setSelectedNiche] = useState<ProductNiche | "all">(
+    "all",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "title">("newest");
 
   // Queries
-  const allProducts = useQuery(
-    api.products.listPublished,
-    selectedCategory !== "all" ? { category: selectedCategory } : {},
-  );
+  const allProducts = useQuery(api.products.listPublished, {
+    ...(selectedCategory !== "all" && { category: selectedCategory }),
+    ...(selectedNiche !== "all" && { niche: selectedNiche }),
+  });
   const productCount = useQuery(api.products.getCount);
 
   const handleProductClick = (productId: Id<"products">) => {
@@ -77,6 +82,7 @@ export default function LibraryPage() {
 
   const clearFilters = () => {
     setSelectedCategory("all");
+    setSelectedNiche("all");
     setSearchQuery("");
     setSortBy("newest");
     router.push("/library");
@@ -115,7 +121,11 @@ export default function LibraryPage() {
       }
     });
 
-  const hasActiveFilters = selectedCategory !== "all" || searchQuery || showNew;
+  const hasActiveFilters =
+    selectedCategory !== "all" ||
+    selectedNiche !== "all" ||
+    searchQuery ||
+    showNew;
 
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -171,6 +181,25 @@ export default function LibraryPage() {
               {CATEGORIES.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
                   {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedNiche}
+            onValueChange={(value) =>
+              setSelectedNiche(value as ProductNiche | "all")
+            }
+          >
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Niche" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les niches</SelectItem>
+              {PRODUCT_NICHES.map((niche) => (
+                <SelectItem key={niche.id} value={niche.id}>
+                  {niche.icon} {niche.label}
                 </SelectItem>
               ))}
             </SelectContent>

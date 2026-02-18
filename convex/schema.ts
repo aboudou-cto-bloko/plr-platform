@@ -36,6 +36,18 @@ export default defineSchema({
       v.literal("kit"),
       v.literal("script"),
     ),
+    niche: v.union(
+      v.literal("technologie"),
+      v.literal("business_finance"),
+      v.literal("developpement_personnel"),
+      v.literal("education_apprentissage"),
+      v.literal("divertissement"),
+      v.literal("sante_bien_etre"),
+      v.literal("litterature_edition"),
+      v.literal("medias_communication"),
+      v.literal("religion"),
+      v.literal("autres"),
+    ),
     description: v.string(),
     thumbnailId: v.optional(v.id("_storage")),
     zipFileId: v.id("_storage"),
@@ -46,6 +58,7 @@ export default defineSchema({
     status: v.union(v.literal("draft"), v.literal("published")),
   })
     .index("by_category", ["category"])
+    .index("by_niche", ["niche"])
     .index("by_status", ["status"])
     .index("by_nouveau", ["isNouveau"]),
 

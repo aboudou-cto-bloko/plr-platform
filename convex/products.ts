@@ -85,6 +85,20 @@ export const listPublished = query({
         v.literal("script"),
       ),
     ),
+    niche: v.optional(
+      v.union(
+        v.literal("technologie"),
+        v.literal("business_finance"),
+        v.literal("developpement_personnel"),
+        v.literal("education_apprentissage"),
+        v.literal("divertissement"),
+        v.literal("sante_bien_etre"),
+        v.literal("litterature_edition"),
+        v.literal("medias_communication"),
+        v.literal("religion"),
+        v.literal("autres"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     let products = await ctx.db
@@ -97,6 +111,11 @@ export const listPublished = query({
       products = products.filter((p) => p.category === args.category);
     }
 
+    // Filter by niche if provided
+    if (args.niche) {
+      products = products.filter((p) => p.niche === args.niche);
+    }
+
     // Add thumbnail URLs
     return Promise.all(
       products.map(async (product) => ({
@@ -105,6 +124,7 @@ export const listPublished = query({
         title: product.title,
         description: product.description,
         category: product.category,
+        niche: product.niche,
         isNouveau: product.isNouveau,
         thumbnailUrl: product.thumbnailId
           ? await ctx.storage.getUrl(product.thumbnailId)

@@ -169,10 +169,6 @@ export const validateUpload = mutation({
   },
 });
 
-// ============================================
-// PRODUCTS CRUD
-// ============================================
-
 export const createProduct = mutation({
   args: {
     title: v.string(),
@@ -182,6 +178,18 @@ export const createProduct = mutation({
       v.literal("formation"),
       v.literal("kit"),
       v.literal("script"),
+    ),
+    niche: v.union(
+      v.literal("technologie"),
+      v.literal("business_finance"),
+      v.literal("developpement_personnel"),
+      v.literal("education_apprentissage"),
+      v.literal("divertissement"),
+      v.literal("sante_bien_etre"),
+      v.literal("litterature_edition"),
+      v.literal("medias_communication"),
+      v.literal("religion"),
+      v.literal("autres"),
     ),
     description: v.string(),
     thumbnailId: v.optional(v.id("_storage")),
@@ -196,6 +204,7 @@ export const createProduct = mutation({
     const productId = await ctx.db.insert("products", {
       title: args.title,
       category: args.category,
+      niche: args.niche,
       description: args.description,
       thumbnailId: args.thumbnailId,
       zipFileId: args.zipFileId,
@@ -211,7 +220,7 @@ export const createProduct = mutation({
       userId: admin._id,
       action: "product_created",
       details: `Created product: ${args.title}`,
-      metadata: { productId, category: args.category },
+      metadata: { productId, category: args.category, niche: args.niche },
       createdAt: Date.now(),
     });
 
@@ -230,6 +239,20 @@ export const updateProduct = mutation({
         v.literal("formation"),
         v.literal("kit"),
         v.literal("script"),
+      ),
+    ),
+    niche: v.optional(
+      v.union(
+        v.literal("technologie"),
+        v.literal("business_finance"),
+        v.literal("developpement_personnel"),
+        v.literal("education_apprentissage"),
+        v.literal("divertissement"),
+        v.literal("sante_bien_etre"),
+        v.literal("litterature_edition"),
+        v.literal("medias_communication"),
+        v.literal("religion"),
+        v.literal("autres"),
       ),
     ),
     description: v.optional(v.string()),
@@ -251,6 +274,7 @@ export const updateProduct = mutation({
     if (updates.title !== undefined) filteredUpdates.title = updates.title;
     if (updates.category !== undefined)
       filteredUpdates.category = updates.category;
+    if (updates.niche !== undefined) filteredUpdates.niche = updates.niche;
     if (updates.description !== undefined)
       filteredUpdates.description = updates.description;
     if (updates.thumbnailId !== undefined)
@@ -263,14 +287,12 @@ export const updateProduct = mutation({
       filteredUpdates.isNouveau = updates.isNouveau;
     if (updates.status !== undefined) filteredUpdates.status = updates.status;
 
-    // Set publishedAt if publishing for the first time
     if (updates.status === "published" && !existing.publishedAt) {
       filteredUpdates.publishedAt = Date.now();
     }
 
     await ctx.db.patch(productId, filteredUpdates);
 
-    // Log audit
     await ctx.db.insert("auditLogs", {
       userId: admin._id,
       action: "product_updated",

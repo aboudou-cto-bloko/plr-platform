@@ -49,7 +49,9 @@ import {
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { PRODUCT_CATEGORIES } from "@/lib/constants";
+import { PRODUCT_CATEGORIES, PRODUCT_NICHES } from "@/lib/constants";
+import type { ProductNiche } from "@/convex/constants";
+
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import Image from "next/image";
@@ -73,12 +75,14 @@ export default function ProductEditPage() {
     title: string;
     description: string;
     category: ProductCategory | "";
+    niche: ProductNiche | "";
     isNouveau: boolean;
     status: "draft" | "published";
   }>({
     title: "",
     description: "",
     category: "",
+    niche: "",
     isNouveau: false,
     status: "draft",
   });
@@ -94,6 +98,7 @@ export default function ProductEditPage() {
         title: product.title,
         description: product.description || "",
         category: product.category,
+        niche: product.niche || "",
         isNouveau: product.isNouveau,
         status: product.status,
       });
@@ -200,6 +205,7 @@ export default function ProductEditPage() {
         title: formData.title,
         description: formData.description,
         category: formData.category as ProductCategory,
+        niche: formData.niche as ProductNiche,
         isNouveau: formData.isNouveau,
         status: formData.status,
       };
@@ -379,6 +385,27 @@ export default function ProductEditPage() {
                       {PRODUCT_CATEGORIES.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
                           {cat.icon} {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Niche *</Label>
+                  <Select
+                    value={formData.niche}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, niche: value as ProductNiche })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une niche" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRODUCT_NICHES.map((niche) => (
+                        <SelectItem key={niche.id} value={niche.id}>
+                          {niche.icon} {niche.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

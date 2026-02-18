@@ -18,7 +18,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { IconUpload, IconFile, IconPhoto } from "@tabler/icons-react";
-import { PRODUCT_CATEGORIES } from "@/lib/constants";
+import { PRODUCT_CATEGORIES, PRODUCT_NICHES } from "@/lib/constants";
+import type { ProductNiche } from "@/convex/constants";
 import type { ProductCategory } from "@/convex/constants";
 
 export default function UploadPage() {
@@ -31,12 +32,14 @@ export default function UploadPage() {
     title: string;
     description: string;
     category: ProductCategory | "";
+    niche: ProductNiche | "";
     isNouveau: boolean;
     status: "draft" | "published";
   }>({
     title: "",
     description: "",
     category: "",
+    niche: "",
     isNouveau: true,
     status: "draft",
   });
@@ -98,7 +101,12 @@ export default function UploadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.category || !productFile) {
+    if (
+      !formData.title ||
+      !formData.category ||
+      !formData.niche ||
+      !productFile
+    ) {
       toast.error("Veuillez remplir tous les champs requis");
       return;
     }
@@ -120,6 +128,7 @@ export default function UploadPage() {
         title: formData.title,
         description: formData.description,
         category: formData.category as ProductCategory,
+        niche: formData.niche as ProductNiche,
         thumbnailId,
         zipFileId,
         fileSize: productFile.size,
@@ -134,6 +143,7 @@ export default function UploadPage() {
         title: "",
         description: "",
         category: "",
+        niche: "",
         isNouveau: true,
         status: "draft",
       });
@@ -209,6 +219,27 @@ export default function UploadPage() {
                   {PRODUCT_CATEGORIES.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.icon} {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Niche *</Label>
+              <Select
+                value={formData.niche}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, niche: value as ProductNiche })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une niche" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCT_NICHES.map((niche) => (
+                    <SelectItem key={niche.id} value={niche.id}>
+                      {niche.icon} {niche.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
