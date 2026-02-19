@@ -1,3 +1,4 @@
+// components/product/ProductDetail.tsx
 "use client";
 
 import { useQuery } from "convex/react";
@@ -17,6 +18,8 @@ import {
   IconSparkles,
   IconUsers,
   IconShieldCheck,
+  IconCoin,
+  IconInfinity,
 } from "@tabler/icons-react";
 import { DownloadRateLimit } from "../dashboard/download-rate-limit";
 import Image from "next/image";
@@ -51,11 +54,17 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
 
 export function ProductDetail({ productId }: ProductDetailProps) {
   const product = useQuery(api.products.getByIdWithDetails, { productId });
+  const user = useQuery(api.users.getCurrentUser);
+  const creditsInfo = useQuery(api.downloads.getUserCredits);
   const hasDownloaded = useQuery(api.downloads.hasUserDownloaded, {
     productId,
   });
 
-  if (product === undefined || hasDownloaded === undefined) {
+  if (
+    product === undefined ||
+    hasDownloaded === undefined ||
+    user === undefined
+  ) {
     return <ProductDetailSkeleton />;
   }
 
@@ -67,6 +76,9 @@ export function ProductDetail({ productId }: ProductDetailProps) {
     label: product.category,
     color: "bg-muted text-muted-foreground",
   };
+
+  const isSubscribed = user?.subscriptionStatus === "active";
+  const creditCost = product.creditCost ?? 1;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -117,6 +129,19 @@ export function ProductDetail({ productId }: ProductDetailProps) {
               )}
             </div>
 
+            {/* Credit cost badge - for free users */}
+            {!isSubscribed && creditCost > 0 && (
+              <div className="absolute top-4 right-4">
+                <Badge
+                  variant="secondary"
+                  className="gap-1 shadow-lg backdrop-blur-sm bg-background/90"
+                >
+                  <IconCoin className="size-3.5 text-amber-500" />
+                  {creditCost} crédit{creditCost > 1 ? "s" : ""}
+                </Badge>
+              </div>
+            )}
+
             {/* Download count on image */}
             <div className="absolute bottom-4 right-4">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white text-sm">
@@ -164,20 +189,58 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           <div className="card-gradient rounded-xl border border-border p-6 space-y-5">
             {/* Price/Access indicator */}
             <div className="text-center pb-4 border-b border-border">
-              <p className="text-sm text-muted-foreground mb-1">
-                Inclus dans votre abonnement
-              </p>
-              <p className="text-2xl font-bold text-gradient">Accès illimité</p>
+              {isSubscribed ? (
+                <>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Inclus dans votre abonnement
+                  </p>
+                  <p className="text-2xl font-bold text-gradient flex items-center justify-center gap-2">
+                    <IconInfinity className="size-6" />
+                    Accès illimité
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Coût du téléchargement
+                  </p>
+                  <p className="text-2xl font-bold text-amber-500 flex items-center justify-center gap-2">
+                    <IconCoin className="size-6" />
+                    {creditCost} crédit{creditCost > 1 ? "s" : ""}
+                  </p>
+                  {creditsInfo && !creditsInfo.isUnlimited && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Vous avez {creditsInfo.credits} crédit
+                      {(creditsInfo.credits ?? 0) > 1 ? "s" : ""} disponible
+                      {(creditsInfo.credits ?? 0) > 1 ? "s" : ""}
+                    </p>
+                  )}
+                </>
+              )}
             </div>
 
             <DownloadButton
               productId={productId}
               productTitle={product.title}
+              creditCost={creditCost}
               size="lg"
               className="w-full btn-glow"
             />
 
             <DownloadRateLimit />
+
+            {/* Upgrade CTA for free users */}
+            {!isSubscribed && (
+              <div className="pt-3 border-t border-border">
+                <Link
+                  href="/payment"
+                  className="flex items-center justify-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <IconSparkles className="size-4" />
+                  Passez Premium pour un accès illimité
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Features Card */}
@@ -214,12 +277,38 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             </ul>
           </div>
 
+          {/* Credits info for free users */}
+          {!isSubscribed && creditsInfo && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <IconCoin className="size-4 text-amber-500" />
+                <span className="text-sm font-medium">Vos crédits</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">
+                  {creditsInfo.credits}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  / {creditsInfo.maxCredits} ce mois
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 bg-amber-500/20 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 rounded-full transition-all"
+                  style={{
+                    width: `${((creditsInfo.credits ?? 0) / (creditsInfo.maxCredits ?? 30)) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Help Card */}
           <div className="rounded-xl border border-dashed border-border p-4 text-center">
             <p className="text-xs text-muted-foreground">
               Besoin d&apos;aide ?{" "}
               <Link
-                href="/support"
+                href="/help"
                 className="text-primary hover:underline font-medium"
               >
                 Contactez le support

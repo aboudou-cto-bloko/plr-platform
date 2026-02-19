@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { SUBSCRIPTION } from "./constants";
+import { CREDITS, SUBSCRIPTION } from "./constants";
 
 // ============================================
 // AUTH HELPERS
@@ -191,6 +191,7 @@ export const createProduct = mutation({
       v.literal("religion"),
       v.literal("autres"),
     ),
+    creditCost: v.optional(v.number()),
     description: v.string(),
     thumbnailId: v.optional(v.id("_storage")),
     zipFileId: v.id("_storage"),
@@ -205,6 +206,7 @@ export const createProduct = mutation({
       title: args.title,
       category: args.category,
       niche: args.niche,
+      creditCost: args.creditCost ?? CREDITS.DEFAULT_PRODUCT_COST,
       description: args.description,
       thumbnailId: args.thumbnailId,
       zipFileId: args.zipFileId,
@@ -241,6 +243,7 @@ export const updateProduct = mutation({
         v.literal("script"),
       ),
     ),
+    creditCost: v.optional(v.number()),
     niche: v.optional(
       v.union(
         v.literal("technologie"),
@@ -289,6 +292,9 @@ export const updateProduct = mutation({
 
     if (updates.status === "published" && !existing.publishedAt) {
       filteredUpdates.publishedAt = Date.now();
+    }
+    if (updates.creditCost !== undefined) {
+      filteredUpdates.creditCost = Math.max(1, updates.creditCost);
     }
 
     await ctx.db.patch(productId, filteredUpdates);

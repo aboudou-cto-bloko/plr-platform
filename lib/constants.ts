@@ -48,3 +48,9 @@ export const PRODUCT_NICHES = [
 ] as const;
 
 export type ProductNiche = (typeof PRODUCT_NICHES)[number]["id"];
+
+export const CREDITS = {
+  FREE_MONTHLY_CREDITS: 30,
+  DEFAULT_PRODUCT_COST: 10,
+  RESET_DAY: 1,
+} as const;

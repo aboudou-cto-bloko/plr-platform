@@ -7,7 +7,9 @@ import {
   IconSparkles,
   IconFileText,
   IconArrowRight,
+  IconCoin,
 } from "@tabler/icons-react";
+
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +17,7 @@ type Product = {
   _id: Id<"products">;
   title: string;
   category: string;
+  creditCost?: number;
   description?: string;
   thumbnailUrl: string | null;
   isNouveau: boolean;
@@ -99,6 +102,9 @@ function ProductGridCard({
     color: "bg-muted text-muted-foreground",
   };
 
+  const showCreditCost =
+    product.creditCost !== undefined && product.creditCost > 0;
+
   return (
     <article
       className={cn(
@@ -124,22 +130,50 @@ function ProductGridCard({
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.isNouveau && (
-            <Badge className="badge-new gap-1 shadow-lg">
-              <IconSparkles className="size-3" />
-              Nouveau
-            </Badge>
+        {/* NEW badge */}
+        {product.isNouveau && (
+          <Badge className="absolute top-3 left-3 badge-new gap-1 shadow-lg">
+            <IconSparkles className="size-3" />
+            Nouveau
+          </Badge>
+        )}
+
+        {/* CATEGORY badge (from ProductCard) */}
+        <Badge
+          variant="outline"
+          className={cn(
+            "absolute top-3 right-3 shadow-sm backdrop-blur-sm bg-background/80 border",
+            categoryConfig.color,
           )}
-        </div>
+        >
+          {categoryConfig.label}
+        </Badge>
 
-        {/* Quick view button on hover */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <div className="flex items-center justify-center gap-2 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow-lg">
-            <span>Voir le produit</span>
+        {/* CREDIT badge (from ProductCard) */}
+        {showCreditCost && (
+          <Badge
+            variant="secondary"
+            className="absolute bottom-3 left-3 gap-1 shadow-sm backdrop-blur-sm bg-background/90 text-foreground"
+          >
+            <IconCoin className="size-3 text-amber-500" />
+            {product.creditCost} crédit
+            {product.creditCost! > 1 ? "s" : ""}
+          </Badge>
+        )}
+
+        {/* Quick view button (from ProductCard) */}
+        <div
+          className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100
+          transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+        >
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
+            bg-primary text-primary-foreground text-sm font-medium shadow-lg
+            hover:bg-primary/90 transition-colors"
+          >
+            <span>Voir</span>
             <IconArrowRight className="size-4" />
           </div>
         </div>
@@ -160,20 +194,17 @@ function ProductGridCard({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2">
-          <Badge
-            variant="secondary"
-            className={cn("text-xs font-medium", categoryConfig.color)}
-          >
-            {categoryConfig.label}
-          </Badge>
-
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          {/* Download count */}
           {product.downloadCount !== undefined && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <IconDownload className="size-3.5" />
               <span>{product.downloadCount}</span>
             </div>
           )}
+
+          {/* Arrow indicator */}
+          <IconArrowRight className="size-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
         </div>
       </div>
     </article>

@@ -49,7 +49,7 @@ import {
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { PRODUCT_CATEGORIES, PRODUCT_NICHES } from "@/lib/constants";
+import { PRODUCT_CATEGORIES, PRODUCT_NICHES, CREDITS } from "@/lib/constants";
 import type { ProductNiche } from "@/convex/constants";
 
 import { formatDistanceToNow } from "date-fns";
@@ -75,6 +75,7 @@ export default function ProductEditPage() {
     title: string;
     description: string;
     category: ProductCategory | "";
+    creditCost: number | "";
     niche: ProductNiche | "";
     isNouveau: boolean;
     status: "draft" | "published";
@@ -82,6 +83,7 @@ export default function ProductEditPage() {
     title: "",
     description: "",
     category: "",
+    creditCost: "",
     niche: "",
     isNouveau: false,
     status: "draft",
@@ -98,6 +100,7 @@ export default function ProductEditPage() {
         title: product.title,
         description: product.description || "",
         category: product.category,
+        creditCost: product.creditCost || "",
         niche: product.niche || "",
         isNouveau: product.isNouveau,
         status: product.status,
@@ -205,6 +208,8 @@ export default function ProductEditPage() {
         title: formData.title,
         description: formData.description,
         category: formData.category as ProductCategory,
+        creditCost:
+          (formData.creditCost as number) ?? CREDITS.DEFAULT_PRODUCT_COST,
         niche: formData.niche as ProductNiche,
         isNouveau: formData.isNouveau,
         status: formData.status,
@@ -389,6 +394,27 @@ export default function ProductEditPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="creditCost">Coût en crédits</Label>
+                  <Input
+                    id="creditCost"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={formData.creditCost}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        creditCost: Math.max(1, Number(e.target.value)),
+                      })
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Nombre de crédits nécessaires pour télécharger ce produit
+                    (utilisateurs gratuits)
+                  </p>
                 </div>
 
                 <div className="space-y-2">

@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { IconUpload, IconFile, IconPhoto } from "@tabler/icons-react";
-import { PRODUCT_CATEGORIES, PRODUCT_NICHES } from "@/lib/constants";
+import { PRODUCT_CATEGORIES, PRODUCT_NICHES, CREDITS } from "@/lib/constants";
 import type { ProductNiche } from "@/convex/constants";
 import type { ProductCategory } from "@/convex/constants";
 
@@ -33,6 +33,7 @@ export default function UploadPage() {
     description: string;
     category: ProductCategory | "";
     niche: ProductNiche | "";
+    creditCost: number;
     isNouveau: boolean;
     status: "draft" | "published";
   }>({
@@ -40,6 +41,7 @@ export default function UploadPage() {
     description: "",
     category: "",
     niche: "",
+    creditCost: CREDITS.DEFAULT_PRODUCT_COST,
     isNouveau: true,
     status: "draft",
   });
@@ -129,6 +131,7 @@ export default function UploadPage() {
         description: formData.description,
         category: formData.category as ProductCategory,
         niche: formData.niche as ProductNiche,
+        creditCost: formData.creditCost,
         thumbnailId,
         zipFileId,
         fileSize: productFile.size,
@@ -144,6 +147,7 @@ export default function UploadPage() {
         description: "",
         category: "",
         niche: "",
+        creditCost: CREDITS.DEFAULT_PRODUCT_COST,
         isNouveau: true,
         status: "draft",
       });
@@ -223,6 +227,27 @@ export default function UploadPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="creditCost">Coût en crédits</Label>
+              <Input
+                id="creditCost"
+                type="number"
+                min={1}
+                max={100}
+                value={formData.creditCost}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    creditCost: Math.max(1, Number(e.target.value)),
+                  })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Nombre de crédits nécessaires pour télécharger ce produit
+                (utilisateurs gratuits)
+              </p>
             </div>
 
             <div className="space-y-2">

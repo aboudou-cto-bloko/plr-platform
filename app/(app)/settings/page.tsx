@@ -1,3 +1,4 @@
+// app/(app)/settings/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,13 +19,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import {
   IconLoader2,
   IconCheck,
   IconMail,
   IconUser,
+  IconCoin,
+  IconInfinity,
+  IconSparkles,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const user = useQuery(api.users.getCurrentUser);
@@ -164,6 +172,9 @@ export default function SettingsPage() {
         </CardFooter>
       </Card>
 
+      {/* Credits Card */}
+      <CreditsCard />
+
       {/* Account Stats */}
       <Card>
         <CardHeader>
@@ -198,6 +209,113 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function CreditsCard() {
+  const creditsInfo = useQuery(api.downloads.getUserCredits);
+
+  if (!creditsInfo) {
+    return <Skeleton className="h-40 rounded-xl" />;
+  }
+
+  // Utilisateur abonné
+  if (creditsInfo.isUnlimited) {
+    return (
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <IconInfinity className="size-5 text-primary" />
+                Téléchargements illimités
+              </CardTitle>
+              <CardDescription>
+                Votre abonnement Premium inclut un accès illimité à toute la
+                bibliothèque
+              </CardDescription>
+            </div>
+            <Badge className="bg-primary">
+              <IconSparkles className="mr-1 size-3" />
+              Premium
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Total téléchargements : {creditsInfo.totalUsed}</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Utilisateur gratuit
+  const credits = creditsInfo.credits ?? 0;
+  const maxCredits = creditsInfo.maxCredits ?? 30;
+  const percentage = (credits / maxCredits) * 100;
+  const isLow = credits <= 5;
+
+  return (
+    <Card className={isLow ? "border-orange-500/30" : ""}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <IconCoin
+                className={`size-5 ${isLow ? "text-orange-500" : "text-amber-500"}`}
+              />
+              Crédits de téléchargement
+            </CardTitle>
+            <CardDescription>
+              Vos crédits se renouvellent chaque mois
+            </CardDescription>
+          </div>
+          <div className="text-right">
+            <p
+              className={`text-3xl font-bold ${isLow ? "text-orange-500" : ""}`}
+            >
+              {credits}
+            </p>
+            <p className="text-xs text-muted-foreground">/ {maxCredits}</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Progress
+          value={percentage}
+          className={`h-2 ${isLow ? "[&>div]:bg-orange-500" : "[&>div]:bg-amber-500"}`}
+        />
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">
+            {creditsInfo.resetsAt && (
+              <>
+                Renouvellement{" "}
+                {formatDistanceToNow(creditsInfo.resetsAt, {
+                  addSuffix: true,
+                  locale: fr,
+                })}
+              </>
+            )}
+          </span>
+          <span className="text-muted-foreground">
+            Utilisés ce mois : {creditsInfo.totalUsed}
+          </span>
+        </div>
+
+        {isLow && (
+          <div className="flex items-center justify-between rounded-lg bg-orange-500/10 p-3">
+            <p className="text-sm text-orange-600 dark:text-orange-400">
+              Crédits bientôt épuisés ! Passez Premium pour un accès illimité.
+            </p>
+            <Button size="sm" asChild>
+              <Link href="/payment">Passer Premium</Link>
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

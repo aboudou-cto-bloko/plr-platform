@@ -1,3 +1,4 @@
+// components/product/DownloadButton.tsx
 "use client";
 
 import { useState } from "react";
@@ -13,6 +14,7 @@ import {
   IconClock,
   IconCheck,
   IconLoader2,
+  IconCoin,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -21,6 +23,7 @@ import { cn } from "@/lib/utils";
 interface DownloadButtonProps {
   productId: Id<"products">;
   productTitle: string;
+  creditCost?: number;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
@@ -30,6 +33,7 @@ interface DownloadButtonProps {
 export function DownloadButton({
   productId,
   productTitle,
+  creditCost = 1,
   variant = "default",
   size = "default",
   className,
@@ -37,6 +41,8 @@ export function DownloadButton({
 }: DownloadButtonProps) {
   const user = useQuery(api.users.getCurrentUser);
   const rateLimit = useQuery(api.downloads.checkRateLimit);
+  const creditsInfo = useQuery(api.downloads.getUserCredits);
+  const canDownload = useQuery(api.downloads.canDownloadProduct, { productId });
   const hasDownloaded = useQuery(api.downloads.hasUserDownloaded, {
     productId,
   });
@@ -47,15 +53,26 @@ export function DownloadButton({
   const [downloadComplete, setDownloadComplete] = useState(false);
 
   // États d'accès
-  const isLoading = user === undefined;
+  const isLoading =
+    user === undefined ||
+    creditsInfo === undefined ||
+    canDownload === undefined;
   const isLocked = user?.isLocked;
-  const isActive = user?.subscriptionStatus === "active";
+  const isSubscribed = user?.subscriptionStatus === "active";
   const isExpired = user?.subscriptionStatus === "expired";
-  const isFree = user?.subscriptionStatus === "none";
+  const isFree =
+    user?.subscriptionStatus === "none" ||
+    user?.subscriptionStatus === "cancelled";
   const isRateLimited = rateLimit && !rateLimit.allowed;
 
+  // Crédits
+  const hasEnoughCredits = canDownload?.canDownload ?? false;
+  const userCredits = creditsInfo?.credits ?? 0;
+  const isUnlimited = creditsInfo?.isUnlimited ?? false;
+
   const handleDownload = async () => {
-    if (!isActive || isLocked || isRateLimited) return;
+    if (isLocked || isRateLimited) return;
+    if (!isSubscribed && !hasEnoughCredits) return;
 
     setIsDownloading(true);
     setDownloadComplete(false);
@@ -78,7 +95,15 @@ export function DownloadButton({
         document.body.removeChild(link);
 
         setDownloadComplete(true);
-        toast.success(`Téléchargement de "${productTitle}" démarré`);
+
+        // Message différent selon le type d'utilisateur
+        if (result.creditsUsed > 0) {
+          toast.success(
+            `Téléchargement démarré ! -${result.creditsUsed} crédit${result.creditsUsed > 1 ? "s" : ""} (reste: ${result.creditsRemaining})`,
+          );
+        } else {
+          toast.success(`Téléchargement de "${productTitle}" démarré`);
+        }
 
         // Reset après 3 secondes
         setTimeout(() => setDownloadComplete(false), 3000);
@@ -169,22 +194,36 @@ export function DownloadButton({
     );
   }
 
-  // Free user - needs subscription
-  if (isFree || !isActive) {
+  // Free user - not enough credits
+  if (isFree && !hasEnoughCredits) {
     return (
-      <Button
-        size={size}
-        className={cn(
-          "relative bg-gradient-to-r from-primary to-[oklch(0.65_0.18_180)] hover:opacity-90 transition-opacity",
-          className,
-        )}
-        asChild
-      >
-        <Link href="/payment">
-          {showIcon && <IconCrown className="size-4 mr-2" />}
-          <span>S&apos;abonner pour télécharger</span>
-        </Link>
-      </Button>
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          size={size}
+          className={cn(
+            "relative w-full border-orange-500/50 text-orange-600 dark:text-orange-400",
+            className,
+          )}
+          disabled
+        >
+          {showIcon && <IconCoin className="size-4 mr-2" />}
+          <span>Crédits insuffisants</span>
+          <span className="ml-1.5 px-1.5 py-0.5 rounded bg-orange-500/10 text-xs font-medium">
+            {userCredits}/{creditCost}
+          </span>
+        </Button>
+        <Button
+          size="sm"
+          className="w-full bg-gradient-to-r from-primary to-[oklch(0.65_0.18_180)]"
+          asChild
+        >
+          <Link href="/payment">
+            <IconCrown className="size-4 mr-2" />
+            Passer Premium pour un accès illimité
+          </Link>
+        </Button>
+      </div>
     );
   }
 
@@ -224,7 +263,34 @@ export function DownloadButton({
     );
   }
 
-  // Ready to download
+  // Ready to download - Free user with enough credits
+  if (isFree && hasEnoughCredits) {
+    return (
+      <Button
+        variant={variant}
+        size={size}
+        className={cn("relative group overflow-hidden", "btn-glow", className)}
+        onClick={handleDownload}
+      >
+        {/* Hover effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+
+        {showIcon && (
+          <IconDownload className="size-4 mr-2 relative z-10 group-hover:animate-bounce" />
+        )}
+        <span className="relative z-10">
+          {hasDownloaded ? "Re-télécharger" : "Télécharger"}
+        </span>
+        {/* Credit cost badge */}
+        <span className="ml-2 px-1.5 py-0.5 rounded bg-white/20 text-xs font-medium relative z-10 flex items-center gap-1">
+          <IconCoin className="size-3" />
+          {creditCost}
+        </span>
+      </Button>
+    );
+  }
+
+  // Ready to download - Subscribed user (unlimited)
   return (
     <Button
       variant={variant}

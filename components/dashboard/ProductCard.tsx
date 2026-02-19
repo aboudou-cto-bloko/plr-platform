@@ -8,6 +8,7 @@ import {
   IconDownload,
   IconSparkles,
   IconArrowRight,
+  IconCoin,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,8 @@ interface ProductCardProps {
   thumbnailUrl?: string | null;
   isNew?: boolean;
   downloadCount?: number;
+  creditCost?: number;
+  showCreditCost?: boolean; // false pour les abonnés
   onDownload?: () => void;
 }
 
@@ -57,6 +60,8 @@ export function ProductCard({
   thumbnailUrl,
   isNew,
   downloadCount,
+  creditCost,
+  showCreditCost = true,
   onDownload,
 }: ProductCardProps) {
   const categoryConfig = CATEGORY_CONFIG[category] || {
@@ -112,6 +117,17 @@ export function ProductCard({
             {categoryConfig.label}
           </Badge>
 
+          {/* Credit cost badge - bottom left */}
+          {showCreditCost && creditCost !== undefined && creditCost > 0 && (
+            <Badge
+              variant="secondary"
+              className="absolute bottom-3 left-3 gap-1 shadow-sm backdrop-blur-sm bg-background/90 text-foreground"
+            >
+              <IconCoin className="size-3 text-amber-500" />
+              {creditCost} crédit{creditCost > 1 ? "s" : ""}
+            </Badge>
+          )}
+
           {/* Quick action on hover */}
           <button
             type="button"
@@ -141,17 +157,26 @@ export function ProductCard({
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-2 border-t border-border/50">
-            {downloadCount !== undefined && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <IconDownload className="size-3.5" />
-                <span>
-                  {downloadCount} téléchargement{downloadCount !== 1 ? "s" : ""}
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {/* Download count */}
+              {downloadCount !== undefined && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <IconDownload className="size-3.5" />
+                  <span>{downloadCount}</span>
+                </div>
+              )}
+
+              {/* Credit cost (text version in footer for subscribers hidden) */}
+              {showCreditCost && creditCost !== undefined && creditCost > 0 && (
+                <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                  <IconCoin className="size-3.5" />
+                  <span>{creditCost}</span>
+                </div>
+              )}
+            </div>
 
             {/* Arrow indicator */}
-            <IconArrowRight className="size-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all ml-auto" />
+            <IconArrowRight className="size-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
           </div>
         </div>
       </article>
