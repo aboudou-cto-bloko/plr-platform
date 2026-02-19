@@ -1,36 +1,46 @@
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export function FinalCTA() {
   return (
-    <section className="relative overflow-hidden bg-black">
-      {/* Top border gradient */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <section className="relative overflow-hidden bg-[#040D1A]">
+      {/* Top border */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-      {/* Background glow */}
-      <div className="pointer-events-none absolute right-0 top-1/2 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/4 rounded-full bg-primary/10 blur-3xl" />
+      {/* Background glows */}
+      <div className="pointer-events-none absolute left-0 top-1/2 h-[500px] w-[500px] -translate-x-1/3 -translate-y-1/2 rounded-full bg-primary/8 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-1/2 h-[400px] w-[400px] translate-x-1/3 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 py-20 md:py-28">
         <div className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Left - Content */}
+          {/* ── Left — Content ── */}
           <div>
-            <h2 className="text-3xl font-bold text-white lg:text-4xl xl:text-5xl">
-              Prêt à lancer votre{" "}
-              <span className="text-gradient">business digital</span> ?
+            {/* H2 */}
+            <h2 className="text-3xl font-bold leading-[1.1] tracking-[-0.025em] text-white lg:text-4xl xl:text-5xl">
+              Votre premier produit digital.
+              <br />
+              <span className="text-gradient">
+                Il attend dans la bibliothèque.
+              </span>
             </h2>
 
-            <p className="mt-6 max-w-md text-lg text-white/60">
-              Rejoignez les entrepreneurs qui vendent déjà des produits
-              digitaux. Accès immédiat à toute la bibliothèque.
+            {/* Subtext */}
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-white/50">
+              <span className="font-medium text-white/75">
+                Un abonnement à 10,000 FCFA débloque tout.
+              </span>
             </p>
 
-            {/* CTA Buttons */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="group">
+            {/* CTAs */}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                asChild
+                size="lg"
+                className="group shadow-lg shadow-primary/20"
+              >
                 <Link href="/signup">
-                  Commencer maintenant
+                  Accéder gratuitement
                   <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </Button>
@@ -38,98 +48,61 @@ export function FinalCTA() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                className="border-white/[0.12] bg-white/[0.03] text-white hover:bg-white/[0.07] hover:text-white"
               >
                 <Link href="#pricing">Voir le tarif</Link>
               </Button>
             </div>
-
-            {/* Trust line */}
-            <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/40">
-              <span className="flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 text-emerald-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                15,000 FCFA/mois
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 text-emerald-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Sans engagement
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 text-emerald-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Garantie 7 jours
-              </span>
-            </div>
           </div>
 
-          {/* Right - Avatar/Memoji */}
+          {/* ── Right — Emoji hero ── */}
           <div className="relative flex items-center justify-center lg:justify-end">
-            {/* Glow behind avatar */}
-            <div className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-primary/30 to-primary/5 blur-3xl" />
+            {/* Glow derrière l'emoji */}
+            <div className="pointer-events-none absolute h-72 w-72 rounded-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent blur-3xl" />
 
-            {/* Avatar container */}
-            <div className="relative">
-              {/* Platform/desk effect */}
-              <div className="absolute -bottom-4 left-1/2 h-8 w-48 -translate-x-1/2 rounded-full bg-gradient-to-t from-white/5 to-transparent blur-xl" />
+            {/* Card conteneur */}
+            <div className="relative flex h-72 w-72 items-center justify-center overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B1628] shadow-2xl shadow-black/40 md:h-80 md:w-80">
+              {/* Noise texture subtile */}
+              <div
+                className="absolute inset-0 opacity-[0.025]"
+                style={{
+                  backgroundImage:
+                    "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+                }}
+              />
 
-              {/*
-                Replace this placeholder with your actual Memoji/3D Avatar
-                You can create one at:
-                - Apple Memoji (if you have an iPhone)
-                - Bitmoji
-                - Ready Player Me (readyplayer.me)
-                - Avaturn (avaturn.me)
+              {/* Radial glow interne */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
 
-                Recommended: Excited/thumbs up expression
-              */}
-              <div className="relative h-72 w-72 md:h-80 md:w-80">
-                {/* Uncomment and use when you have the actual avatar image */}
-                {/*
-                <Image
-                  src="/images/memoji-excited.png"
-                  alt="Avatar"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-                */}
+              {/* Emoji */}
+              <span
+                className="relative select-none text-[120px] leading-none md:text-[140px]"
+                role="img"
+                aria-label="Entrepreneur célébrant"
+              >
+                🚀
+              </span>
+
+              {/* Badge flottant — haut gauche */}
+              <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[11px] font-semibold text-emerald-400">
+                  Accès immédiat
+                </span>
               </div>
+
+              {/* Ring hover */}
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-white/[0.07]" />
             </div>
+
+            {/* Platform shadow */}
+            <div className="absolute -bottom-4 left-1/2 h-8 w-48 -translate-x-1/2 rounded-full bg-primary/10 blur-xl" />
           </div>
         </div>
       </div>
 
-      {/* Bottom transition to footer */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      {/* Bottom transition */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
     </section>
   );
 }

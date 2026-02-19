@@ -2,253 +2,250 @@ import { Check } from "lucide-react";
 
 const features = [
   {
-    tag: "Bibliothèque complète",
-    title: "Parcourez des produits prêts à vendre",
+    tag: "Catalogue prêt à l'emploi",
+    title: "100+ produits. Filtrés. Classés. Prêts.",
     description:
-      "Accédez à une collection de produits digitaux triés par catégorie. Filtrez par type, niche ou popularité pour trouver exactement ce dont vous avez besoin.",
+      "Ebooks, templates, formations, scripts — chaque produit livré avec sa licence de revente. Filtrez par niche, téléchargez, commencez à vendre.",
     bullets: [
-      "Ebooks, templates, scripts, formations",
-      "Filtres de recherche avancés",
-      "Classement par type et par niche",
+      "Recherche par niche et par type",
+      "Nouveautés ajoutées chaque semaine",
+      "Badge crédit affiché sur chaque produit",
     ],
     mockupType: "library",
+    url: "plrlibrary.com/library",
   },
   {
     tag: "Téléchargement instantané",
-    title: "Téléchargez en un clic, commencez à vendre",
+    title: "Un clic. Les fichiers sont à vous.",
     description:
-      "Pas d'attente, pas de validation. Sélectionnez un produit, téléchargez les fichiers sources et commencez à personnaliser immédiatement.",
+      "Téléchargement immédiat. Fichiers sources inclus — Word, Canva, Notion. Modifiez, rebrandez, vendez. Vous gardez 100% des profits.",
     bullets: [
       "Téléchargements illimités",
-      "Historique complet de vos downloads",
-      "Accès sécurisé à vos fichiers",
+      "Liens de téléchargement sécurisés",
+      "Fichiers sources éditables inclus",
     ],
-    mockupType: "download",
+    mockupType: "product",
+    url: "plrlibrary.com/product",
   },
   {
-    tag: "Données marché",
-    title: "Vendez avec des insights, pas au hasard",
+    tag: "Historique complet",
+    title: "Chaque téléchargement conservé. Re-téléchargez à tout moment.",
     description:
-      "Chaque produit inclut des recommandations de marché et des estimations de revenus potentiels pour vous aider à prendre les bonnes décisions.",
+      "Retrouvez tous vos fichiers dans votre historique. Statistiques du jour, du mois, crédits restants — tout est suivi automatiquement.",
     bullets: [
-      "Estimations de revenus par produit",
-      "Recommandations de prix de vente",
-      "Niches et audiences suggérées",
+      "Re-téléchargement illimité de vos produits",
+      "Statistiques : aujourd'hui · ce mois · restants",
+      "Accès direct à la fiche produit depuis l'historique",
     ],
-    mockupType: "insights",
+    mockupType: "downloads",
+    url: "plrlibrary.com/downloads",
   },
 ];
 
-// Mockup components - Dark themed
+// ─── MOCKUP: LIBRARY ───────────────────────────────────────────────────────
 function LibraryMockup() {
+  const products = [
+    {
+      title: "Guide Instagram Pro",
+      category: "Ebook",
+      categoryColor: "bg-blue-500/20 text-blue-300",
+      gradient: "from-violet-500 to-purple-600",
+      credits: 3,
+      downloads: 128,
+      isNew: false,
+    },
+    {
+      title: "Pack Templates Canva",
+      category: "Template",
+      categoryColor: "bg-purple-500/20 text-purple-300",
+      gradient: "from-pink-500 to-rose-600",
+      credits: 5,
+      downloads: 94,
+      isNew: true,
+    },
+    {
+      title: "Formation Copywriting",
+      category: "Formation",
+      categoryColor: "bg-green-500/20 text-green-300",
+      gradient: "from-amber-500 to-orange-600",
+      credits: 8,
+      downloads: 61,
+      isNew: true,
+    },
+    {
+      title: "Scripts de Vente",
+      category: "Script",
+      categoryColor: "bg-pink-500/20 text-pink-300",
+      gradient: "from-blue-500 to-indigo-600",
+      credits: 4,
+      downloads: 83,
+      isNew: false,
+    },
+  ];
+
   return (
-    <div className="flex h-full flex-col bg-[#0a0a0a]">
-      <div className="flex flex-1">
-        {/* Mini sidebar */}
-        <div className="hidden w-12 flex-shrink-0 border-r border-white/10 bg-white/[0.02] p-2 sm:block sm:w-14 sm:p-3">
-          <div className="space-y-2 sm:space-y-3">
-            <div className="h-6 w-6 rounded-lg bg-primary/30 sm:h-8 sm:w-8" />
-            <div className="h-6 w-6 rounded-lg bg-white/10 sm:h-8 sm:w-8" />
-            <div className="h-6 w-6 rounded-lg bg-white/10 sm:h-8 sm:w-8" />
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 p-3 sm:p-4">
-          {/* Search bar */}
-          <div className="mb-3 flex gap-2 sm:mb-4">
-            <div className="h-8 flex-1 rounded-lg bg-white/5 sm:h-9" />
-            <div className="hidden h-8 w-20 rounded-lg bg-primary/20 sm:block sm:h-9 sm:w-24" />
-          </div>
-
-          {/* Filter tabs */}
-          <div className="mb-3 flex gap-1.5 overflow-x-auto sm:mb-4 sm:gap-2">
-            <div className="flex h-6 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-[9px] font-medium text-white sm:h-7 sm:w-16 sm:text-[10px]">
-              Tous
-            </div>
-            <div className="flex h-6 w-16 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] text-white/60 sm:h-7 sm:w-20 sm:text-[10px]">
-              Ebooks
-            </div>
-            <div className="flex h-6 w-20 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] text-white/60 sm:h-7 sm:w-24 sm:text-[10px]">
-              Templates
-            </div>
-            <div className="hidden h-6 w-16 items-center justify-center rounded-full bg-white/10 text-[9px] text-white/60 sm:flex sm:h-7 sm:text-[10px]">
-              Scripts
-            </div>
-          </div>
-
-          {/* Product grid */}
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className={`overflow-hidden rounded-lg border border-white/10 ${i > 4 ? "hidden sm:block" : ""}`}
-              >
-                <div
-                  className={`aspect-[4/3] ${
-                    i === 1
-                      ? "bg-gradient-to-br from-violet-500 to-purple-600"
-                      : i === 2
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                        : i === 3
-                          ? "bg-gradient-to-br from-emerald-500 to-teal-600"
-                          : i === 4
-                            ? "bg-gradient-to-br from-amber-500 to-orange-600"
-                            : i === 5
-                              ? "bg-gradient-to-br from-pink-500 to-rose-600"
-                              : "bg-gradient-to-br from-cyan-500 to-blue-600"
-                  }`}
-                />
-                <div className="bg-white/[0.02] p-1.5 sm:p-2">
-                  <div className="h-1.5 w-12 rounded bg-white/20 sm:h-2 sm:w-16" />
-                  <div className="mt-1 h-1.5 w-8 rounded bg-white/10 sm:h-2 sm:w-10" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DownloadMockup() {
-  return (
-    <div className="flex h-full flex-col bg-[#0a0a0a] p-3 sm:p-4">
-      {/* Header */}
-      <div className="mb-3 flex items-center justify-between sm:mb-4">
+    <div className="flex h-full flex-col bg-[#0B1628]">
+      {/* Page header */}
+      <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2.5 sm:px-4">
         <div>
-          <div className="h-2.5 w-24 rounded bg-white/20 sm:h-3 sm:w-32" />
-          <div className="mt-1 h-2 w-16 rounded bg-white/10 sm:w-24" />
+          <div className="text-xs font-semibold text-white sm:text-sm">
+            Bibliothèque
+          </div>
+          <div className="text-[9px] text-white/40 sm:text-[10px]">
+            32 produits disponibles
+          </div>
         </div>
-        <div className="h-7 w-7 rounded-full bg-primary/20 sm:h-8 sm:w-8" />
+        <div className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 ring-1 ring-primary/20">
+          <svg
+            className="h-2 w-2 text-primary"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+          </svg>
+          <span className="text-[8px] font-medium text-primary sm:text-[9px]">
+            4 nouveautés
+          </span>
+        </div>
       </div>
 
-      {/* Download list */}
-      <div className="flex-1 space-y-2 sm:space-y-3">
-        {[
-          { name: "Guide Instagram Pro", status: "Terminé", color: "emerald" },
-          { name: "Pack Templates Canva", status: "Terminé", color: "emerald" },
-          { name: "Scripts de Vente", status: "En cours", color: "amber" },
-        ].map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-2 sm:gap-3 sm:p-3"
-          >
-            <div
-              className={`h-8 w-8 shrink-0 rounded-lg sm:h-10 sm:w-10 ${
-                i === 0
-                  ? "bg-gradient-to-br from-violet-500 to-purple-600"
-                  : i === 1
-                    ? "bg-gradient-to-br from-pink-500 to-rose-600"
-                    : "bg-gradient-to-br from-blue-500 to-indigo-600"
-              }`}
-            />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[10px] font-medium text-white sm:text-xs">
-                {item.name}
-              </div>
-              <div className="text-[9px] text-white/40 sm:text-[10px]">
-                PDF • 2.4 MB
-              </div>
-            </div>
-            <div
-              className={`shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-medium sm:px-2 sm:text-[10px] ${
-                item.color === "emerald"
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-amber-500/20 text-amber-400"
-              }`}
+      {/* Search + selects */}
+      <div className="border-b border-white/[0.06] px-3 py-2 sm:px-4">
+        <div className="flex items-center gap-1.5">
+          <div className="flex flex-1 items-center gap-1.5 rounded-md bg-white/[0.05] px-2 py-1.5 ring-1 ring-white/[0.08]">
+            <svg
+              className="h-3 w-3 shrink-0 text-white/25"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              {item.status}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <span className="text-[9px] text-white/20">
+              Rechercher un produit...
+            </span>
+          </div>
+          {["Catégorie", "Niche"].map((l) => (
+            <div
+              key={l}
+              className="hidden items-center gap-1 rounded-md bg-white/[0.05] px-2 py-1.5 ring-1 ring-white/[0.08] sm:flex"
+            >
+              <span className="text-[9px] text-white/30">{l}</span>
+              <svg
+                className="h-2 w-2 text-white/20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Category pills */}
+      <div className="flex gap-1.5 border-b border-white/[0.06] overflow-x-auto px-3 py-2 sm:px-4">
+        {["Tous", "Ebooks", "Templates", "Formations", "Kits"].map((p, i) => (
+          <div
+            key={p}
+            className={`shrink-0 rounded-md px-2 py-0.5 text-[9px] font-medium sm:text-[10px] ${i === 0 ? "bg-primary text-white" : "bg-white/[0.05] text-white/40 ring-1 ring-white/[0.08]"}`}
+          >
+            {p}
           </div>
         ))}
       </div>
 
-      {/* Security badge */}
-      <div className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-emerald-500/10 p-2 sm:mt-4">
-        <svg
-          className="h-3.5 w-3.5 text-emerald-400 sm:h-4 sm:w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          />
-        </svg>
-        <span className="text-[9px] font-medium text-emerald-400 sm:text-[10px]">
-          Téléchargements sécurisés
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function InsightsMockup() {
-  return (
-    <div className="flex h-full flex-col bg-[#0a0a0a] p-3 sm:p-4">
-      {/* Product header */}
-      <div className="mb-3 flex items-start gap-2 sm:mb-4 sm:gap-3">
-        <div className="h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 sm:h-16 sm:w-16" />
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-xs font-semibold text-white sm:text-sm">
-            Guide Instagram Pro
-          </div>
-          <div className="text-[10px] text-white/40 sm:text-xs">
-            Ebook • 45 pages
-          </div>
-          <div className="mt-1.5 flex flex-wrap gap-1 sm:mt-2 sm:gap-2">
-            <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[8px] font-medium text-primary sm:px-2 sm:text-[10px]">
-              Marketing
-            </span>
-            <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[8px] text-white/50 sm:px-2 sm:text-[10px]">
-              Social Media
-            </span>
-          </div>
+      {/* Products grid */}
+      <div className="flex-1 overflow-hidden p-3 sm:p-4">
+        <div className="mb-2 text-[9px] text-white/25 sm:text-[10px]">
+          32 produits trouvés
         </div>
-      </div>
-
-      {/* Stats cards */}
-      <div className="mb-3 grid grid-cols-2 gap-2 sm:mb-4 sm:gap-3">
-        <div className="rounded-xl bg-emerald-500/10 p-2 sm:p-3">
-          <div className="text-base font-bold text-emerald-400 sm:text-lg">
-            15-25K
-          </div>
-          <div className="text-[8px] text-emerald-400/70 sm:text-[10px]">
-            FCFA estimé/vente
-          </div>
-        </div>
-        <div className="rounded-xl bg-primary/10 p-2 sm:p-3">
-          <div className="text-base font-bold text-primary sm:text-lg">
-            4.8/5
-          </div>
-          <div className="text-[8px] text-primary/70 sm:text-[10px]">
-            Score potentiel
-          </div>
-        </div>
-      </div>
-
-      {/* Suggested niches */}
-      <div className="flex-1">
-        <div className="mb-2 text-[10px] font-medium text-white/60 sm:text-xs">
-          Niches suggérées
-        </div>
-        <div className="space-y-2">
-          {["Entrepreneurs", "Community Managers", "Coachs"].map((niche, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="h-1.5 flex-1 rounded-full bg-white/10">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {products.map((product, i) => (
+            <div
+              key={i}
+              className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03]"
+            >
+              <div
+                className={`relative aspect-[4/3] bg-gradient-to-br ${product.gradient}`}
+              >
+                {product.isNew && (
+                  <div className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[7px] font-semibold text-white">
+                    <svg
+                      className="h-1.5 w-1.5"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                    </svg>
+                    Nouveau
+                  </div>
+                )}
                 <div
-                  className="h-1.5 rounded-full bg-primary"
-                  style={{ width: `${90 - i * 15}%` }}
-                />
+                  className={`absolute right-1.5 top-1.5 rounded-full px-1 py-0.5 text-[7px] font-medium backdrop-blur-sm ${product.categoryColor}`}
+                >
+                  {product.category}
+                </div>
+                <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 rounded-full bg-black/50 px-1.5 py-0.5 backdrop-blur-sm">
+                  <svg
+                    className="h-1.5 w-1.5 text-amber-400"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  <span className="text-[7px] font-medium text-white/80">
+                    {product.credits} cr.
+                  </span>
+                </div>
               </div>
-              <span className="w-24 text-right text-[9px] text-white/50 sm:w-28 sm:text-[10px]">
-                {niche}
-              </span>
+              <div className="p-1.5">
+                <div className="truncate text-[9px] font-semibold text-white/85">
+                  {product.title}
+                </div>
+                <div className="mt-1 flex items-center justify-between border-t border-white/[0.06] pt-1">
+                  <div className="flex items-center gap-0.5 text-[8px] text-white/30">
+                    <svg
+                      className="h-2 w-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    {product.downloads}
+                  </div>
+                  <svg
+                    className="h-2.5 w-2.5 text-white/20"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -257,13 +254,425 @@ function InsightsMockup() {
   );
 }
 
+function DownloadsMockup() {
+  const downloads = [
+    {
+      title: "Guide Instagram Pro",
+      category: "Ebook",
+      gradient: "from-violet-500 to-purple-600",
+      time: "il y a 2 minutes",
+    },
+    {
+      title: "Pack Templates Canva",
+      category: "Template",
+      gradient: "from-pink-500 to-rose-600",
+      time: "il y a 1 heure",
+    },
+    {
+      title: "Formation Copywriting",
+      category: "Formation",
+      gradient: "from-amber-500 to-orange-600",
+      time: "il y a 3 heures",
+    },
+    {
+      title: "Scripts de Vente",
+      category: "Script",
+      gradient: "from-blue-500 to-indigo-600",
+      time: "il y a 2 jours",
+    },
+    {
+      title: "Kit Email Marketing",
+      category: "Kit",
+      gradient: "from-cyan-500 to-blue-600",
+      time: "il y a 5 jours",
+    },
+  ];
+
+  return (
+    <div className="flex h-full flex-col bg-[#0B1628]">
+      {/* Page header */}
+      <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2.5 sm:px-4">
+        <div>
+          <div className="text-xs font-semibold text-white sm:text-sm">
+            Téléchargements
+          </div>
+          <div className="text-[9px] text-white/40 sm:text-[10px]">
+            Historique de vos téléchargements
+          </div>
+        </div>
+
+        {/* Stats badges */}
+        <div className="flex items-center gap-1.5">
+          {[
+            { label: "3 aujourd'hui", color: "border-white/10 text-white/50" },
+            { label: "8 ce mois", color: "border-white/10 text-white/50" },
+            {
+              label: "22 restants",
+              color: "border-primary/30 text-primary bg-primary/5",
+            },
+          ].map((badge) => (
+            <div
+              key={badge.label}
+              className={`hidden rounded-full border px-2 py-0.5 text-[8px] font-medium sm:block ${badge.color}`}
+            >
+              {badge.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Downloads list */}
+      <div className="flex-1 overflow-hidden p-3 sm:p-4">
+        <div className="space-y-2">
+          {downloads.map((item, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 transition-colors hover:bg-white/[0.04] sm:gap-3 sm:p-3"
+            >
+              {/* Thumbnail */}
+              <div
+                className={`h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br sm:h-12 sm:w-12 ${item.gradient}`}
+              />
+
+              {/* Info */}
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[10px] font-medium text-white/85 sm:text-xs">
+                  {item.title}
+                </div>
+                <div className="mt-0.5 flex items-center gap-1.5 text-[8px] text-white/35 sm:text-[9px]">
+                  {/* Clock icon */}
+                  <svg
+                    className="h-2.5 w-2.5 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {item.time}
+                  <span>·</span>
+                  <span className="text-white/30">{item.category}</span>
+                </div>
+              </div>
+
+              {/* External link icon */}
+              <div className="shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.03] p-1.5">
+                <svg
+                  className="h-3 w-3 text-white/30"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+// ─── MOCKUP: PRODUCT PAGE ──────────────────────────────────────────────────
+function ProductMockup() {
+  return (
+    <div className="flex h-full flex-col bg-[#0B1628] p-3 sm:p-5">
+      {/* Product header */}
+      <div className="mb-3 flex gap-3 sm:mb-4 sm:gap-4">
+        <div className="h-16 w-16 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 sm:h-20 sm:w-20" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <div className="text-xs font-semibold text-white sm:text-sm">
+                Guide Instagram Pro
+              </div>
+              <div className="mt-0.5 text-[9px] text-white/40 sm:text-[10px]">
+                PDF · 45 pages · 2.4 MB
+              </div>
+            </div>
+            <div className="shrink-0 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-medium text-blue-300">
+              Ebook
+            </div>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[8px] font-medium text-primary">
+              Marketing
+            </span>
+            <span className="rounded-full bg-white/[0.08] px-1.5 py-0.5 text-[8px] text-white/40">
+              Social Media
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Description placeholder */}
+      <div className="mb-3 space-y-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 sm:mb-4">
+        <div className="h-1.5 w-full rounded bg-white/10" />
+        <div className="h-1.5 w-5/6 rounded bg-white/10" />
+        <div className="h-1.5 w-4/6 rounded bg-white/10" />
+      </div>
+
+      {/* Credit cost + Download CTA */}
+      <div className="mb-3 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+        <div className="flex items-center gap-1.5">
+          <svg
+            className="h-3.5 w-3.5 text-amber-400"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <span className="text-xs font-medium text-white/70">3 crédits</span>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-[10px] font-semibold text-white shadow-md shadow-primary/30 sm:text-xs">
+          <svg
+            className="h-3 w-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          Télécharger
+        </div>
+      </div>
+
+      {/* Download history */}
+      <div className="flex-1">
+        <div className="mb-2 text-[9px] font-medium text-white/40 sm:text-[10px]">
+          Derniers téléchargements
+        </div>
+        <div className="space-y-1.5">
+          {[
+            {
+              name: "Pack Templates Canva",
+              gradient: "from-pink-500 to-rose-600",
+              status: "Terminé",
+              statusColor: "bg-emerald-500/20 text-emerald-400",
+            },
+            {
+              name: "Guide Instagram Pro",
+              gradient: "from-violet-500 to-purple-600",
+              status: "Terminé",
+              statusColor: "bg-emerald-500/20 text-emerald-400",
+            },
+            {
+              name: "Scripts de Vente",
+              gradient: "from-blue-500 to-indigo-600",
+              status: "Terminé",
+              statusColor: "bg-emerald-500/20 text-emerald-400",
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2"
+            >
+              <div
+                className={`h-6 w-6 shrink-0 rounded-md bg-gradient-to-br ${item.gradient}`}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[9px] font-medium text-white/80 sm:text-[10px]">
+                  {item.name}
+                </div>
+                <div className="text-[8px] text-white/30">
+                  ZIP · Fichiers sources
+                </div>
+              </div>
+              <div
+                className={`shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-medium ${item.statusColor}`}
+              >
+                {item.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MOCKUP: DASHBOARD HOME ────────────────────────────────────────────────
+function DashboardMockup() {
+  return (
+    <div className="flex h-full flex-col bg-[#0B1628] p-3 sm:p-5">
+      {/* Welcome */}
+      <div className="mb-3 sm:mb-4">
+        <div className="text-sm font-bold text-white sm:text-base">
+          Bienvenue, Franck 👋
+        </div>
+        <div className="text-[9px] text-white/40 sm:text-[10px]">
+          Voici un aperçu de votre bibliothèque PLR
+        </div>
+      </div>
+
+      {/* Stats cards — SectionCards */}
+      <div className="mb-3 grid grid-cols-2 gap-2 sm:mb-4 sm:grid-cols-4 sm:gap-3">
+        {[
+          {
+            label: "Crédits restants",
+            value: "24",
+            icon: "💰",
+            color: "from-amber-500/15 to-transparent",
+            ring: "ring-amber-500/20",
+            text: "text-amber-400",
+          },
+          {
+            label: "Téléchargements",
+            value: "8",
+            icon: "📦",
+            color: "from-primary/15 to-transparent",
+            ring: "ring-primary/20",
+            text: "text-primary",
+          },
+          {
+            label: "Abonnement",
+            value: "Actif",
+            icon: "⚡",
+            color: "from-emerald-500/15 to-transparent",
+            ring: "ring-emerald-500/20",
+            text: "text-emerald-400",
+          },
+          {
+            label: "Expire dans",
+            value: "18j",
+            icon: "📅",
+            color: "from-blue-500/15 to-transparent",
+            ring: "ring-blue-500/20",
+            text: "text-blue-400",
+          },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className={`rounded-xl bg-gradient-to-br p-2.5 ring-1 ${stat.color} ${stat.ring}`}
+          >
+            <div className="text-base sm:text-lg">{stat.icon}</div>
+            <div className={`mt-1 text-sm font-bold sm:text-base ${stat.text}`}>
+              {stat.value}
+            </div>
+            <div className="text-[8px] text-white/40 sm:text-[9px]">
+              {stat.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Nouveautés section */}
+      <div className="flex-1 overflow-hidden">
+        <div className="mb-2 flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-semibold text-white sm:text-xs">
+              Nouveautés
+            </div>
+            <div className="text-[8px] text-white/40 sm:text-[9px]">
+              Produits récemment ajoutés
+            </div>
+          </div>
+          <div className="flex items-center gap-0.5 text-[8px] font-medium text-primary sm:text-[9px]">
+            Voir tout
+            <svg
+              className="h-2.5 w-2.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {[
+            {
+              title: "Pack Templates Canva",
+              gradient: "from-pink-500 to-rose-600",
+              category: "Template",
+              categoryColor: "bg-purple-500/20 text-purple-300",
+            },
+            {
+              title: "Formation Copywriting",
+              gradient: "from-amber-500 to-orange-600",
+              category: "Formation",
+              categoryColor: "bg-green-500/20 text-green-300",
+            },
+            {
+              title: "Kit Email Marketing",
+              gradient: "from-cyan-500 to-blue-600",
+              category: "Kit",
+              categoryColor: "bg-orange-500/20 text-orange-300",
+            },
+            {
+              title: "Checklist Business",
+              gradient: "from-emerald-500 to-teal-600",
+              category: "Ebook",
+              categoryColor: "bg-blue-500/20 text-blue-300",
+            },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03]"
+            >
+              <div
+                className={`relative aspect-[4/3] bg-gradient-to-br ${p.gradient}`}
+              >
+                <div className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[7px] font-semibold text-white">
+                  <svg
+                    className="h-1.5 w-1.5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                  </svg>
+                  Nouveau
+                </div>
+                <div
+                  className={`absolute right-1.5 top-1.5 rounded-full px-1 py-0.5 text-[7px] font-medium ${p.categoryColor}`}
+                >
+                  {p.category}
+                </div>
+              </div>
+              <div className="p-1.5">
+                <div className="truncate text-[9px] font-semibold text-white/85">
+                  {p.title}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION FEATURES ──────────────────────────────────────────────────────
 export function Features() {
   return (
     <section
       id="features"
-      className="relative overflow-hidden bg-black py-16 sm:py-20 md:py-24"
+      className="relative overflow-hidden bg-[#040D1A] py-16 sm:py-20 md:py-24"
     >
-      {/* Background */}
+      {/* Background glow */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         {/* Header */}
@@ -275,41 +684,36 @@ export function Features() {
             Votre boutique de produits digitaux{" "}
             <span className="text-gradient">commence ici</span>
           </h2>
-          <p className="mt-3 text-base text-white/60 sm:mt-4 sm:text-lg">
-            Une plateforme pensée pour vous faire gagner du temps et maximiser
-            vos ventes.
+          <p className="mt-3 text-base text-white/50 sm:mt-4 sm:text-lg">
+            Téléchargez. Rebrandez. Encaissez.
+            <br />
+            La plateforme fait le reste.
           </p>
         </div>
 
-        {/* Feature sections - alternating layout */}
-        <div className="mt-12 space-y-16 sm:mt-16 sm:space-y-20 md:mt-20 md:space-y-24">
+        {/* Feature blocks */}
+        <div className="mt-12 space-y-16 sm:mt-16 sm:space-y-20 md:mt-20 md:space-y-28">
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`flex flex-col items-center gap-8 sm:gap-10 lg:flex-row lg:gap-12 xl:gap-16 ${
+              className={`flex flex-col items-center gap-8 sm:gap-10 lg:flex-row lg:gap-16 ${
                 index % 2 === 1 ? "lg:flex-row-reverse" : ""
               }`}
             >
-              {/* Text content */}
+              {/* Text */}
               <div className="w-full space-y-4 sm:space-y-5 lg:flex-1 lg:space-y-6">
                 <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary ring-1 ring-primary/20 sm:px-4 sm:py-1.5 sm:text-sm">
                   {feature.tag}
                 </span>
-
                 <h3 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
                   {feature.title}
                 </h3>
-
-                <p className="text-base text-white/60 sm:text-lg">
+                <p className="text-base text-white/50 sm:text-lg">
                   {feature.description}
                 </p>
-
                 <ul className="space-y-2 sm:space-y-3">
-                  {feature.bullets.map((bullet, bulletIndex) => (
-                    <li
-                      key={bulletIndex}
-                      className="flex items-center gap-2 sm:gap-3"
-                    >
+                  {feature.bullets.map((bullet, i) => (
+                    <li key={i} className="flex items-center gap-2 sm:gap-3">
                       <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary">
                         <Check
                           className="h-3 w-3 text-primary-foreground"
@@ -324,31 +728,32 @@ export function Features() {
                 </ul>
               </div>
 
-              {/* Image/Mockup */}
+              {/* Mockup */}
               <div className="w-full lg:flex-1">
-                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] shadow-2xl shadow-primary/5 sm:rounded-2xl">
-                  {/* Glow effect */}
-                  <div className="pointer-events-none absolute -inset-px rounded-xl bg-gradient-to-b from-primary/10 to-transparent opacity-50 sm:rounded-2xl" />
+                <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#0B1628] shadow-2xl shadow-black/40 sm:rounded-2xl">
+                  {/* Subtle top glow */}
+                  <div className="pointer-events-none absolute -inset-px rounded-xl bg-gradient-to-b from-primary/10 to-transparent opacity-40 sm:rounded-2xl" />
 
                   {/* Browser chrome */}
-                  <div className="relative flex items-center gap-1.5 border-b border-white/10 bg-white/[0.03] px-3 py-2 sm:gap-2 sm:px-4 sm:py-3">
+                  <div className="relative flex items-center gap-1.5 border-b border-white/[0.08] bg-[#080F1E] px-3 py-2 sm:px-4 sm:py-2.5">
                     <div className="flex gap-1 sm:gap-1.5">
-                      <div className="h-2 w-2 rounded-full bg-white/20 sm:h-3 sm:w-3" />
-                      <div className="h-2 w-2 rounded-full bg-white/20 sm:h-3 sm:w-3" />
-                      <div className="h-2 w-2 rounded-full bg-white/20 sm:h-3 sm:w-3" />
+                      <div className="h-2 w-2 rounded-full bg-white/15 sm:h-2.5 sm:w-2.5" />
+                      <div className="h-2 w-2 rounded-full bg-white/15 sm:h-2.5 sm:w-2.5" />
+                      <div className="h-2 w-2 rounded-full bg-white/15 sm:h-2.5 sm:w-2.5" />
                     </div>
-                    <div className="ml-2 flex-1 sm:ml-4">
-                      <div className="mx-auto max-w-[140px] rounded-md bg-white/5 px-2 py-0.5 text-[9px] text-white/30 sm:max-w-xs sm:px-3 sm:py-1 sm:text-xs">
-                        plrlibrary.com
+                    <div className="ml-2 flex-1 sm:ml-3">
+                      <div className="mx-auto max-w-[160px] rounded-md bg-white/[0.06] px-2 py-0.5 text-[9px] text-white/30 sm:max-w-xs sm:text-[10px]">
+                        {feature.url}
                       </div>
                     </div>
                   </div>
 
-                  {/* Mockup content */}
+                  {/* Content */}
                   <div className="relative aspect-[4/3]">
                     {feature.mockupType === "library" && <LibraryMockup />}
-                    {feature.mockupType === "download" && <DownloadMockup />}
-                    {feature.mockupType === "insights" && <InsightsMockup />}
+                    {feature.mockupType === "product" && <ProductMockup />}
+                    {feature.mockupType === "dashboard" && <DashboardMockup />}
+                    {feature.mockupType === "downloads" && <DownloadsMockup />}
                   </div>
                 </div>
               </div>

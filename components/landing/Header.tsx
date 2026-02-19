@@ -7,7 +7,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { name: "Fonctionnalités", href: "#features" },
+  { name: "Produits", href: "#features" },
   { name: "Tarif", href: "#pricing" },
   { name: "FAQ", href: "#faq" },
 ];
@@ -31,14 +31,14 @@ export function Header() {
         className={cn(
           "fixed top-0 left-0 z-20 w-full transition-all duration-300",
           isScrolled
-            ? "bg-black/80 border-b border-white/10 backdrop-blur-xl"
+            ? "bg-[#040D1A]/90 border-b border-white/10 backdrop-blur-xl shadow-lg shadow-black/20"
             : "bg-transparent",
         )}
       >
         <div className="mx-auto max-w-5xl px-6">
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0">
             <div className="flex w-full justify-between gap-6 lg:w-auto">
-              {/* Logo - always white */}
+              {/* Logo */}
               <Link
                 href="/"
                 aria-label="PLR Library"
@@ -72,7 +72,7 @@ export function Header() {
                 />
               </button>
 
-              {/* Desktop menu - always white */}
+              {/* Desktop menu */}
               <div className="m-auto hidden size-fit lg:block">
                 <ul className="flex gap-1">
                   {menuItems.map((item, index) => (
@@ -81,7 +81,7 @@ export function Header() {
                         asChild
                         variant="ghost"
                         size="sm"
-                        className="text-white/80 hover:text-white hover:bg-white/10"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
                       >
                         <Link href={item.href}>
                           <span>{item.name}</span>
@@ -93,16 +93,15 @@ export function Header() {
               </div>
             </div>
 
-            {/* Mobile menu + CTA buttons */}
+            {/* Mobile menu + CTA */}
             <div
               className={cn(
                 "mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none",
-                // Mobile menu styling - dark bg for consistency
-                "bg-black/95 border-white/10 shadow-black/50 backdrop-blur-xl",
+                "bg-[#040D1A]/98 border-white/10 shadow-black/60 backdrop-blur-xl",
                 menuState && "block lg:flex",
               )}
             >
-              {/* Mobile menu items */}
+              {/* Mobile links */}
               <div className="lg:hidden">
                 <ul className="space-y-6 text-base">
                   {menuItems.map((item, index) => (
@@ -119,21 +118,19 @@ export function Header() {
                 </ul>
               </div>
 
-              {/* CTA buttons - always visible */}
+              {/* CTAs */}
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                {/* Connexion */}
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="text-white/80 hover:text-white hover:bg-white/10"
+                  className="text-white/70 hover:text-white hover:bg-white/10"
                 >
                   <Link href="/login">
                     <span>Connexion</span>
                   </Link>
                 </Button>
 
-                {/* Primary CTA */}
                 <Button
                   asChild
                   size="sm"
@@ -145,7 +142,7 @@ export function Header() {
                   )}
                 >
                   <Link href="/signup">
-                    <span>Commencer</span>
+                    <span>Accès gratuit</span>
                   </Link>
                 </Button>
               </div>
