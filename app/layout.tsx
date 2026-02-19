@@ -1,10 +1,11 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
+import { AffiliateCapture } from "@/components/affiliate-capture";
 
 const poppins = Poppins({
   variable: "--font-heading",
@@ -36,6 +37,10 @@ export default function RootLayout({
         className={`${poppins.variable} ${inter.variable} font-sans antialiased`}
       >
         <Providers>
+          <Suspense fallback={null}>
+            <AffiliateCapture />
+          </Suspense>
+
           <Toaster richColors position="top-right" />
           <TooltipProvider>{children}</TooltipProvider>
         </Providers>

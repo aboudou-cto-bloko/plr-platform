@@ -1,56 +1,109 @@
+// hooks/use-affiliate.ts
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 const STORAGE_KEY = "plr_affiliate_code";
+const STORAGE_EXPIRY_KEY = "plr_affiliate_code_expiry";
+const EXPIRY_DAYS = 30;
 
-export function useAffiliate() {
+/**
+ * Hook à utiliser dans le layout racine pour capturer le code affilié
+ * dès l'arrivée sur le site (peu importe la page d'entrée)
+ */
+export function useAffiliateCaptureOnMount() {
   const searchParams = useSearchParams();
 
-  const affiliateCode = useMemo(() => {
-    if (typeof window === "undefined") return null;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-    const urlCode = searchParams.get("ref");
+    const refCode = searchParams.get("ref");
 
-    if (urlCode) {
-      const normalized = urlCode.toLowerCase();
-      const stored = localStorage.getItem(STORAGE_KEY);
+    if (refCode) {
+      const code = refCode.toLowerCase().trim();
+      const expiryDate = Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000;
 
-      if (stored !== normalized) {
-        localStorage.setItem(STORAGE_KEY, normalized);
-      }
+      localStorage.setItem(STORAGE_KEY, code);
+      localStorage.setItem(STORAGE_EXPIRY_KEY, expiryDate.toString());
 
-      return normalized;
+      console.log(`[Affiliate] Code captured: ${code}`);
     }
-
-    return localStorage.getItem(STORAGE_KEY);
   }, [searchParams]);
+}
 
-  // Queries
-  const affiliateInfo = useQuery(
-    api.affiliates.getByCode,
-    affiliateCode ? { code: affiliateCode } : "skip",
-  );
+/**
+ * Récupère le code affilié stocké (avec vérification d'expiration)
+ * @returns Le code affilié ou null si absent/expiré
+ */
+export function getStoredAffiliateCode(): string | null {
+  if (typeof window === "undefined") return null;
 
-  const priceInfo = useQuery(
-    api.affiliates.calculatePrice,
-    affiliateCode ? { code: affiliateCode } : { code: undefined },
-  );
+  const code = localStorage.getItem(STORAGE_KEY);
+  const expiryStr = localStorage.getItem(STORAGE_EXPIRY_KEY);
 
-  // Clear code
-  const clearAffiliateCode = () => {
-    localStorage.removeItem(STORAGE_KEY);
-  };
+  if (!code) return null;
+
+  // Si pas de date d'expiration, on considère le code comme valide
+  // (rétrocompatibilité avec les codes stockés avant cette mise à jour)
+  if (expiryStr) {
+    const expiry = parseInt(expiryStr, 10);
+
+    // Vérifier si expiré
+    if (Date.now() > expiry) {
+      clearAffiliateCode();
+      console.log(`[Affiliate] Code expired: ${code}`);
+      return null;
+    }
+  }
+
+  return code;
+}
+
+/**
+ * Stocke un code affilié manuellement (ex: saisi dans un input)
+ * @param code Le code affilié à stocker
+ */
+export function setAffiliateCode(code: string): void {
+  if (typeof window === "undefined") return;
+
+  const cleanCode = code.toLowerCase().trim();
+  const expiryDate = Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+
+  localStorage.setItem(STORAGE_KEY, cleanCode);
+  localStorage.setItem(STORAGE_EXPIRY_KEY, expiryDate.toString());
+}
+
+/**
+ * Supprime le code affilié du localStorage
+ */
+export function clearAffiliateCode(): void {
+  if (typeof window === "undefined") return;
+
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_EXPIRY_KEY);
+}
+
+/**
+ * Hook complet pour gérer le code affilié dans un composant
+ * Retourne le code actuel et des fonctions pour le manipuler
+ */
+export function useAffiliateCode() {
+  const getCode = useCallback(() => {
+    return getStoredAffiliateCode();
+  }, []);
+
+  const setCode = useCallback((code: string) => {
+    setAffiliateCode(code);
+  }, []);
+
+  const clearCode = useCallback(() => {
+    clearAffiliateCode();
+  }, []);
 
   return {
-    affiliateCode,
-    affiliateInfo,
-    priceInfo,
-    isLoading: affiliateInfo === undefined || priceInfo === undefined,
-    isValidAffiliate: !!affiliateInfo,
-    clearAffiliateCode,
+    getCode,
+    setCode,
+    clearCode,
   };
 }

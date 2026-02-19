@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense, useMemo } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQuery, useAction } from "convex/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,11 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { formatPrice, SUBSCRIPTION } from "@/lib/constants";
+import {
+  getStoredAffiliateCode,
+  setAffiliateCode,
+  clearAffiliateCode,
+} from "@/hooks/use-affiliate";
 
 const PLAN_FEATURES = [
   "Accès à tous les produits PLR",
@@ -36,25 +41,8 @@ const PLAN_FEATURES = [
   "Support par email",
 ];
 
-const STORAGE_KEY = "plr_affiliate_code";
-
-// Helper pour récupérer le code initial (côté client uniquement)
-function getInitialCode(searchParams: URLSearchParams): string | null {
-  if (typeof window === "undefined") return null;
-
-  const urlCode = searchParams.get("ref");
-  if (urlCode) {
-    const code = urlCode.toLowerCase().trim();
-    localStorage.setItem(STORAGE_KEY, code);
-    return code;
-  }
-
-  return localStorage.getItem(STORAGE_KEY);
-}
-
 function PaymentContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const user = useQuery(api.users.getCurrentUser);
   const initPayment = useAction(api.payments.initializePayment);
 
@@ -62,15 +50,10 @@ function PaymentContent() {
   const [error, setError] = useState<string | null>(null);
   const [isApplyingCode, setIsApplyingCode] = useState(false);
 
-  // Initialiser le code une seule fois avec useMemo
-  const initialCode = useMemo(
-    () => getInitialCode(searchParams),
-    [searchParams],
-  );
+  const storedCode = getStoredAffiliateCode();
 
-  // State pour le code affilié
-  const [promoCode, setPromoCode] = useState(initialCode || "");
-  const [appliedCode, setAppliedCode] = useState<string | null>(initialCode);
+  const [appliedCode, setAppliedCode] = useState<string | null>(storedCode);
+  const [promoCode, setPromoCode] = useState<string>(storedCode ?? "");
 
   // Vérifier le code affilié et calculer le prix
   const priceInfo = useQuery(
@@ -97,7 +80,7 @@ function PaymentContent() {
     const code = promoCode.toLowerCase().trim();
 
     // Sauvegarder et appliquer
-    localStorage.setItem(STORAGE_KEY, code);
+    setAffiliateCode(code);
     setAppliedCode(code);
 
     // Le résultat sera mis à jour automatiquement via la query
@@ -105,7 +88,7 @@ function PaymentContent() {
   };
 
   const handleRemoveCode = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    clearAffiliateCode();
     setAppliedCode(null);
     setPromoCode("");
   };
