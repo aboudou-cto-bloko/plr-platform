@@ -24,4 +24,10 @@ crons.daily(
   internal.renewalCron.sendRenewalReminders,
 );
 
+crons.monthly(
+  "reset all user credits",
+  { day: 1, hourUTC: 0, minuteUTC: 5 },
+  internal.credits.resetAllCredits,
+);
+
 export default crons;

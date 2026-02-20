@@ -200,9 +200,43 @@ export const initializeCredits = internalMutation({
   },
 });
 
-// ============================================
-// HELPERS
-// ============================================
+/**
+ * Reset les crédits de tous les utilisateurs gratuits
+ * Appelé par le cron job le 1er de chaque mois
+ */
+export const resetAllCredits = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    // Récupérer tous les utilisateurs non-abonnés
+    const users = await ctx.db
+      .query("users")
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("subscriptionStatus"), "none"),
+          q.eq(q.field("subscriptionStatus"), "expired"),
+          q.eq(q.field("subscriptionStatus"), "cancelled"),
+        ),
+      )
+      .collect();
+
+    const nextResetDate = getNextResetDate();
+    let resetCount = 0;
+
+    for (const user of users) {
+      await ctx.db.patch(user._id, {
+        credits: CREDITS.FREE_MONTHLY_CREDITS,
+        creditsResetAt: nextResetDate,
+      });
+      resetCount++;
+    }
+
+    console.log(
+      `[Cron] Credits reset for ${resetCount} users. Next reset: ${new Date(nextResetDate).toISOString()}`,
+    );
+
+    return { resetCount };
+  },
+});
 
 function getNextResetDate(): number {
   const now = new Date();
